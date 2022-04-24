@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
-from config import STRAVA_WEBHOOK
+from strava_calendar_summary_web_service.config import STRAVA_WEBHOOK
 
 router = APIRouter()
 
