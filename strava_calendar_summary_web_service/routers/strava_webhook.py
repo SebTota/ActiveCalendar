@@ -8,7 +8,7 @@ router = APIRouter()
 def get_webhook(request: Request):
     params = request.query_params
     if 'hub.mode' not in params or 'hub.verify_token' not in params or 'hub.challenge' not in params:
-        raise HTTPException(status_code=400, detail='Missing request parameters')
+        raise HTTPException(status_code=400, detail='Missing required request parameters')
 
     hub_mode = params['hub.mode']
     hub_verification_token = params['hub.verify_token']
@@ -22,12 +22,12 @@ def get_webhook(request: Request):
 
 
 @router.post('/webhook')
-def post_webhook(request: Request):
-    body = request.json()
+async def post_webhook(request: Request):
+    body = await request.json()
 
     if 'subscription_id' not in body or 'object_type' not in body or 'aspect_type' not in body \
         or 'owner_id' not in body or 'object_id' not in body:
-        raise HTTPException(status_code=400, detail='Missing request parameters')
+        raise HTTPException(status_code=400, detail='Missing required request parameters')
 
     subscription_id = body['subscription_id']
 
