@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
-from strava_calendar_summary_web_service.config import STRAVA_WEBHOOK
+import os
 
 router = APIRouter()
 
@@ -14,7 +14,7 @@ def get_webhook(request: Request):
     hub_verification_token = params['hub.verify_token']
     hub_challenge = params['hub.challenge']
 
-    if hub_mode == 'subscribe' and hub_verification_token == STRAVA_WEBHOOK['VERIFY_TOKEN']:
+    if hub_mode == 'subscribe' and hub_verification_token == os.getenv('STRAVA_WEBHOOK_VERIFICATION_TOKEN'):
         print('Webhook verified')
         return {'hub.challenge': hub_challenge}
     else:
@@ -31,7 +31,7 @@ async def post_webhook(request: Request):
 
     subscription_id = body['subscription_id']
 
-    if int(subscription_id) != int(STRAVA_WEBHOOK['SUBSCRIPTION_ID']):
+    if int(subscription_id) != int(os.getenv('STRAVA_SUBSCRIPTION_ID')):
         raise HTTPException(status_code=400, detail='Invalid subscription id')
 
     object_type = body['object_type']

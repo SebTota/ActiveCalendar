@@ -4,8 +4,8 @@ from apiclient import discovery
 import httplib2
 from oauth2client import client
 import json
+import os
 
-from strava_calendar_summary_web_service.config import STRAVA_WEBHOOK
 from strava_calendar_summary_data_access_layer import User, UserController, StravaAuth
 from strava_calendar_summary_utils import StravaUtil
 
@@ -35,10 +35,12 @@ async def google_calendar_login_auth(request: Request, strava_access_token: Opti
     code = body['google_auth_code']
 
     # Exchange auth code for access token, refresh token, and ID token
-    credentials = client.credentials_from_clientsecrets_and_code(
-        CLIENT_SECRET_FILE_PATH,
-        ['https://www.googleapis.com/auth/calendar.app.created', 'profile', 'email'],
-        code)
+    credentials = client.credentials_from_code(
+        client_id = os.getenv('GOOGLE_CLIENT_ID'),
+        client_secret = os.getenv('GOOGLE_CLIENT_SECRET'),
+        scope = ['https://www.googleapis.com/auth/calendar.app.created', 'profile', 'email'],
+        code = code
+    )
 
     # TODO: There has to be a better way to structure the StravaUtils class to not have to do this
     # OR maybe the user id should not be the strava ID and we should have that mapping elsewhere

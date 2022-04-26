@@ -39,8 +39,8 @@ rsa==4.8
 six==1.16.0
 sniffio==1.2.0
 starlette==0.17.1
-strava-calendar-summary-data-access-layer==0.0.10
-strava-calendar-summary-utils==0.0.7
+-e git+https://github.com/SebTota/StravaCalendarSummaryDataAccessLayer.git@88e3af1bec5c3c0483f08699d4703ec276d49ba6#egg=strava_calendar_summary_data_access_layer
+-e git+https://github.com/SebTota/StravaCalendarSummaryUtils.git@da72c22f10a90f33b7c4ad7fbb26dadb71fbb36f#egg=strava_calendar_summary_utils
 stravalib==0.10.4
 typing-extensions==4.2.0
 units==0.7

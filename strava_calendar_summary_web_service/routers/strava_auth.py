@@ -4,8 +4,8 @@ from typing import Optional
 from fastapi.responses import RedirectResponse
 from stravalib.client import Client
 import logging
+import os
 
-from strava_calendar_summary_web_service.config import STRAVA_API
 from strava_calendar_summary_data_access_layer import User, UserController, StravaAuth
 from strava_calendar_summary_utils import StravaUtil
 
@@ -18,8 +18,8 @@ def strava_get_authorization_token():
     strava_client = Client()  # TODO: Move this to utils package
     return {
         'strava_client_id': strava_client.authorization_url(
-            client_id=STRAVA_API['STRAVA_CLIENT_ID'], 
-            redirect_uri='http://localhost:8000/auth/strava/authorized',
+            client_id=int(os.getenv('STRAVA_CLIENT_ID')), 
+            redirect_uri=os.getenv('STRAVA_REDIRECT_URI'),
             scope='activity:read_all')
     }
 
@@ -34,8 +34,8 @@ def strava_authorized_callback(request: Request):
 
     try:
         token_response = strava_client.exchange_code_for_token(
-            client_id=STRAVA_API['STRAVA_CLIENT_ID'], 
-            client_secret=STRAVA_API['STRAVA_CLIENT_SECRET'], 
+            client_id=int(os.getenv('STRAVA_CLIENT_ID')), 
+            client_secret=os.getenv('STRAVA_CLIENT_SECRET'), 
             code=code)
     except:
         logging.error('Could not authenticate user with Strava. Strava exchange code for token failed.')
