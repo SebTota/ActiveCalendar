@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 
 from strava_calendar_summary_web_service.routers import strava_webhook, strava_auth, google_calendar_auth
 from strava_calendar_summary_utils import Logging
 
 app = FastAPI()
+app.add_middleware(SessionMiddleware, secret_key="some-random-string")
 app.include_router(google_calendar_auth.router)
 app.include_router(strava_webhook.router)
 app.include_router(strava_auth.router)

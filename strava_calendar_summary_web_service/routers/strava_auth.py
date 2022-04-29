@@ -1,30 +1,43 @@
-from fastapi import APIRouter, Request, HTTPException, Cookie
 from typing import Optional
-
+from fastapi import APIRouter, Request, HTTPException, Cookie
 from fastapi.responses import RedirectResponse
+from fastapi_sessions.backends.implementations import InMemoryBackend
+from fastapi_sessions.frontends.implementations import SessionCookie, CookieParameters
+from uuid import UUID, uuid4
 from stravalib.client import Client
 import logging
 import os
 
-from strava_calendar_summary_data_access_layer import User, UserController, StravaAuth
+from strava_calendar_summary_data_access_layer import StravaCredentials
 from strava_calendar_summary_utils import StravaUtil
+from strava_calendar_summary_web_service.models import SessionData
+
+backend = InMemoryBackend[UUID, SessionData]()
+
+
+cookie = SessionCookie(
+    cookie_name='cookie',
+    identifier='general_verifier',
+    auto_error=True,
+    secret_key='very_secret_key',
+    cookie_params=CookieParameters()
+)
 
 router = APIRouter()
 
 
-# This route should never really be needed since the auth URL never changes and is hard coded
-@router.get('/auth/strava/getAuthorizationToken')
-def strava_get_authorization_token():
+@router.get('/auth/strava')
+def strava_get_authorization_token(request: Request):
     strava_client = Client()  # TODO: Move this to utils package
-    return {
-        'strava_client_id': strava_client.authorization_url(
-            client_id=int(os.getenv('STRAVA_CLIENT_ID')), 
-            redirect_uri=os.getenv('STRAVA_REDIRECT_URI'),
-            scope='activity:read_all')
-    }
+    auth_url = strava_client.authorization_url(
+            client_id=int(os.getenv('STRAVA_CLIENT_ID')),
+            redirect_uri=request.url_for('strava_authorized_callback'),
+            scope=['activity:read_all'],)
+
+    return RedirectResponse(auth_url)
 
 
-@router.get('/auth/strava/authorized')
+@router.get('/auth/strava/callback')
 def strava_authorized_callback(request: Request):
     if 'code' not in request.query_params:
         raise HTTPException(status_code=400, detail='Missing required request parameters')
@@ -47,9 +60,5 @@ def strava_authorized_callback(request: Request):
     refresh_token = token_response['refresh_token']
     expires_at = token_response['expires_at']
 
-    response = RedirectResponse('http://localhost:5500/StravaCalendarSummaryWebsite/?stage=strava_authorized')
-
-    response.set_cookie('strava_access_token', access_token)
-    response.set_cookie('strava_refresh_token', refresh_token)
-    response.set_cookie('strava_token_expires_at', expires_at)
-    return response
+    request.session['strava_credentials'] = StravaCredentials(access_token, refresh_token, expires_at).to_dict()
+    return RedirectResponse('http://localhost:5500/?stage=strava_authorized')

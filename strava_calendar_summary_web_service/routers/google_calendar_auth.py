@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException, Cookie
+from fastapi.responses import RedirectResponse
 from typing import Optional
 from apiclient import discovery
 import httplib2
@@ -6,48 +7,79 @@ from oauth2client import client
 import json
 import os
 
-from strava_calendar_summary_data_access_layer import User, UserController, StravaAuth
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+
+from strava_calendar_summary_data_access_layer import User, UserController, StravaCredentials
 from strava_calendar_summary_utils import StravaUtil
 
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+GOOGLE_CONFIG_PATH = os.path.join(ROOT_DIR, '../../client_secret.json')
+GOOGLE_CALENDAR_AUTH_SCOPES = ['https://www.googleapis.com/auth/calendar.app.created']
 
 router = APIRouter()
 
-CLIENT_SECRET_FILE_PATH = '/Users/sebastiantota/Documents/Projects/StravaCalendarSummary/StravaCalendarSummaryWebService/strava_calendar_summary_web_service/client_secret.json'
 
-@router.post('/auth/googleCalendar/login')
-async def google_calendar_login_auth(request: Request, strava_access_token: Optional[str] = Cookie(None), strava_refresh_token: Optional[str] = Cookie(None), strava_token_expires_at: Optional[int] = Cookie(None)):
-    if not strava_access_token or not strava_refresh_token or not strava_token_expires_at:
-        raise HTTPException(status_code=400, detail='Could not find strava_auth cookie when processing Google Calendar auth. \
-            Please verify your strava account before verifying your Google Calendar account.')
-
-    strava_credentials = StravaAuth(strava_access_token, strava_refresh_token, strava_token_expires_at)
-    try:
-        body = await request.json()
-    except:
-        raise HTTPException(status_code=400, detail='Missing required request body')
-
-    if not request.headers.get('X-Requested-With'):
-        raise HTTPException(status_code=403, detail='Webhook could not be verified')
-
-    if 'google_auth_code' not in body:
-        raise HTTPException(status_code=400, detail='Missing required request parameters')
-
-    code = body['google_auth_code']
+@router.get('/auth/googleCalendar')
+async def google_calendar_auth(request: Request):
+    # if not strava_access_token or not strava_refresh_token or not strava_token_expires_at:
+    #     raise HTTPException(status_code=400, detail='Could not find strava_auth cookie when processing Google '
+    #                                                 'Calendar auth. Please verify your strava account before '
+    #                                                 'verifying your Google Calendar account.')
 
     # Exchange auth code for access token, refresh token, and ID token
-    credentials = client.credentials_from_code(
-        client_id = os.getenv('GOOGLE_CLIENT_ID'),
-        client_secret = os.getenv('GOOGLE_CLIENT_SECRET'),
-        scope = ['https://www.googleapis.com/auth/calendar.app.created', 'profile', 'email'],
-        code = code
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+        GOOGLE_CONFIG_PATH,
+        scopes=GOOGLE_CALENDAR_AUTH_SCOPES)
+
+    print(request.url_for('google_calendar_auth_callback'))
+    # flow.redirect_uri = 'localhost:8000/auth/google/calendar/verifyLogin'
+    flow.redirect_uri = request.url_for('google_calendar_auth_callback')
+
+    authorization_url, state = flow.authorization_url(
+        access_type='offline'
     )
 
-    # TODO: There has to be a better way to structure the StravaUtils class to not have to do this
-    # OR maybe the user id should not be the strava ID and we should have that mapping elsewhere
-    user: User = User(None, strava_credentials, credentials)
+    request.session['google_auth_state'] = state
+    return RedirectResponse(authorization_url)
 
-    strava_util = StravaUtil(user)
-    user.id = strava_util.get_athlete().id
-    user: User = UserController().insert(user.id, user)
 
-    return 'success'
+@router.get('/auth/googleCalendar/callback')
+async def google_calendar_auth_callback(request: Request):
+    # try:
+    #     body = await request.json()
+    # except:
+    #     raise HTTPException(status_code=400, detail='Missing required request body')
+    #
+    # if 'google_auth_code' not in body:
+    #     raise HTTPException(status_code=400, detail='Missing required request parameters')
+    #
+    # code = body['google_auth_code']
+
+    if 'strava_credentials' not in request.session:
+        raise HTTPException(status_code=400, detail='Please authenticate with Strava before adding a Calendar')
+
+    state = request.session['google_auth_state']
+
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+        GOOGLE_CONFIG_PATH,
+        scopes=GOOGLE_CALENDAR_AUTH_SCOPES,
+        state=state
+    )
+    flow.redirect_uri = request.url_for('google_calendar_auth_callback')
+
+    print(str(request.url))
+    authorization_response = 'https://' + str(request.url).replace('http://', '')
+    flow.fetch_token(authorization_response=authorization_response)
+
+    google_credentials = flow.credentials
+    request.session['google_credentials'] = json.loads(google_credentials.to_json())
+
+    print(request.session['strava_credentials'])
+    strava_creds = StravaCredentials.from_dict(request.session['strava_credentials'])
+    strava_util = StravaUtil(strava_creds)
+
+    user = User(str(strava_util.get_athlete_id()), strava_creds, google_credentials)
+    UserController().insert(user.user_id, user)
+
+    return RedirectResponse('http://localhost:5500/?stage=authorized')
