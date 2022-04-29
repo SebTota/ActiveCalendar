@@ -22,20 +22,15 @@ router = APIRouter()
 
 @router.get('/auth/googleCalendar')
 async def google_calendar_auth(request: Request):
-    # if not strava_access_token or not strava_refresh_token or not strava_token_expires_at:
-    #     raise HTTPException(status_code=400, detail='Could not find strava_auth cookie when processing Google '
-    #                                                 'Calendar auth. Please verify your strava account before '
-    #                                                 'verifying your Google Calendar account.')
+    if 'strava_credentials' not in request.session:
+        raise HTTPException(status_code=400, detail='Please authenticate with Strava before adding a Calendar')
 
     # Exchange auth code for access token, refresh token, and ID token
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         GOOGLE_CONFIG_PATH,
         scopes=GOOGLE_CALENDAR_AUTH_SCOPES)
 
-    print(request.url_for('google_calendar_auth_callback'))
-    # flow.redirect_uri = 'localhost:8000/auth/google/calendar/verifyLogin'
     flow.redirect_uri = request.url_for('google_calendar_auth_callback')
-
     authorization_url, state = flow.authorization_url(
         access_type='offline'
     )
@@ -46,18 +41,11 @@ async def google_calendar_auth(request: Request):
 
 @router.get('/auth/googleCalendar/callback')
 async def google_calendar_auth_callback(request: Request):
-    # try:
-    #     body = await request.json()
-    # except:
-    #     raise HTTPException(status_code=400, detail='Missing required request body')
-    #
-    # if 'google_auth_code' not in body:
-    #     raise HTTPException(status_code=400, detail='Missing required request parameters')
-    #
-    # code = body['google_auth_code']
-
     if 'strava_credentials' not in request.session:
         raise HTTPException(status_code=400, detail='Please authenticate with Strava before adding a Calendar')
+
+    if 'google_auth_state' not in request.session:
+        raise HTTPException(status_code=400, detail='Please authenticate with Google Calendar')
 
     state = request.session['google_auth_state']
 
@@ -68,14 +56,12 @@ async def google_calendar_auth_callback(request: Request):
     )
     flow.redirect_uri = request.url_for('google_calendar_auth_callback')
 
-    print(str(request.url))
     authorization_response = 'https://' + str(request.url).replace('http://', '')
     flow.fetch_token(authorization_response=authorization_response)
 
     google_credentials = flow.credentials
     request.session['google_credentials'] = json.loads(google_credentials.to_json())
 
-    print(request.session['strava_credentials'])
     strava_creds = StravaCredentials.from_dict(request.session['strava_credentials'])
     strava_util = StravaUtil(strava_creds)
 
