@@ -20,11 +20,11 @@ def get_webhook(request: Request):
     hub_challenge = params['hub.challenge']
 
     if hub_mode == 'subscribe' and hub_verification_token == os.getenv('STRAVA_WEBHOOK_VERIFICATION_TOKEN'):
-        logging.error('Webhook verified')
+        logging.info('Webhook verified')
         return {'hub.challenge': hub_challenge}
     else:
         logging.error('Webhook registry request could not be verified due to hub.verify_token being incorrect. Strava '
-                      'hub.verification_token: "{}" with hub.mode: "{}" and the server verificatino code is: "{}"'.format(hub_verification_token, hub_mode, os.getenv('STRAVA_WEBHOOK_VERIFICATION_TOKEN')))
+                      'hub.verification_token: "{}" with hub.mode: "{}".'.format(hub_verification_token, hub_mode))
         raise HTTPException(status_code=403, detail='Webhook could not be verified')
 
 
@@ -34,11 +34,14 @@ async def post_webhook(request: Request):
 
     if 'subscription_id' not in body or 'object_type' not in body or 'aspect_type' not in body \
             or 'owner_id' not in body or 'object_id' not in body or 'event_time' not in body:
+        logging.error('Error processing new event from webhook due to missing parameters in the request body.')
         raise HTTPException(status_code=400, detail='Missing required request parameters')
 
     subscription_id = body['subscription_id']
 
     if int(subscription_id) != int(os.getenv('STRAVA_SUBSCRIPTION_ID')):
+        logging.error('Error processing new event from webhook because the "subscription_id" '
+                      'is different than expected. Provided subscription_id={}'.format(subscription_id))
         raise HTTPException(status_code=400, detail='Invalid subscription id')
 
     object_type = body['object_type']  # activity, athlete
