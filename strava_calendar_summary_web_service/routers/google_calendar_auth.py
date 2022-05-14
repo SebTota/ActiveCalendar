@@ -1,17 +1,15 @@
+from typing import Optional
+
 from fastapi import APIRouter, Request, HTTPException, Cookie
 from fastapi.responses import RedirectResponse
-from typing import Optional
-from apiclient import discovery
-import httplib2
-from oauth2client import client
 import json
 import os
 
-import google.oauth2.credentials
 import google_auth_oauthlib.flow
 
 from strava_calendar_summary_data_access_layer import User, UserController, StravaCredentials
 from strava_calendar_summary_utils import StravaUtil
+from strava_calendar_summary_web_service.models import session_cookie
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 GOOGLE_CONFIG_PATH = os.path.join(ROOT_DIR, '../../client_secret.json')
@@ -21,9 +19,9 @@ router = APIRouter()
 
 
 @router.get('/auth/googleCalendar')
-async def google_calendar_auth(request: Request):
-    if 'strava_credentials' not in request.session:
-        raise HTTPException(status_code=400, detail='Please authenticate with Strava before adding a Calendar')
+async def google_calendar_auth(request: Request, Authentication: Optional[str] = Cookie(None)):
+    if Authentication is None:
+        raise HTTPException(status_code=401, detail='User not signed in')
 
     # Exchange auth code for access token, refresh token, and ID token
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
@@ -40,9 +38,11 @@ async def google_calendar_auth(request: Request):
 
 
 @router.get('/auth/googleCalendar/callback')
-async def google_calendar_auth_callback(request: Request):
-    if 'strava_credentials' not in request.session:
-        raise HTTPException(status_code=400, detail='Please authenticate with Strava before adding a Calendar')
+async def google_calendar_auth_callback(request: Request, Authentication: Optional[str] = Cookie(None)):
+    if Authentication is None:
+        raise HTTPException(status_code=401, detail='User not signed in')
+
+    auth_cookie: session_cookie.SessionCookie = session_cookie.decrypt_session_cookie(Authentication)
 
     if 'google_auth_state' not in request.session:
         raise HTTPException(status_code=400, detail='Please authenticate with Google Calendar')
@@ -56,16 +56,13 @@ async def google_calendar_auth_callback(request: Request):
     )
     flow.redirect_uri = request.url_for('google_calendar_auth_callback')
 
-    authorization_response = 'https://' + str(request.url).replace('http://', '')
+    authorization_response = 'https://' + str(request.url).replace('http://', '').replace('https://', '')
     flow.fetch_token(authorization_response=authorization_response)
 
     google_credentials = flow.credentials
-    request.session['google_credentials'] = json.loads(google_credentials.to_json())
 
-    strava_creds = StravaCredentials.from_dict(request.session['strava_credentials'])
-    strava_util = StravaUtil(strava_creds)
-
-    user = User(str(strava_util.get_athlete_id()), strava_creds, google_credentials)
-    UserController().insert(user.user_id, user)
-
-    return RedirectResponse('http://localhost:5500/?stage=authorized')
+    user_controller: UserController = UserController()
+    user: User = user_controller.get_by_id(auth_cookie.user_id)
+    user.calendar_credentials = google_credentials
+    UserController().update(user.user_id, user)
+    return RedirectResponse(os.getenv('UI_BASE_URL'))
