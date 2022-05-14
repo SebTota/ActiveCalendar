@@ -65,6 +65,7 @@ def strava_authorized_callback(request: Request):
 
 @router.get('/user/me', response_model=UserUI)
 async def get_strava_user_info(response: Response, Authentication: Optional[str] = Cookie(None)):
+    # TODO: Put a redis cache in front of this and update the cache every time the strava refresh token is refreshed
     if Authentication is None:
         raise HTTPException(status_code=401, detail='User not signed in')
 
