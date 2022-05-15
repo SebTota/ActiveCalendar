@@ -5,5 +5,5 @@ config.py
 client_secret.json
 secrets.sh
 google_creds.json
-cert_key.pem
-private_key.pem
+cert.pem
+key.pem

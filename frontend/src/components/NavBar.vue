@@ -13,7 +13,7 @@
     </div>
   </nav>
   <div>
-    <CalendarAuthSetupModal v-if="this.retrievedUser && !this.user.isAuthenticatedCalendar()"/>
+    <CalendarAuthSetupModal v-if="this.retrievedUser && this.user.userIsAuthenticated() && !this.user.isAuthenticatedCalendar()"/>
   </div>
 </template>
 

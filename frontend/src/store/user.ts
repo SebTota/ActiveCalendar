@@ -16,7 +16,7 @@ export const User = defineStore('User', {
   actions: {
     async getUser () {
       try {
-        const res = await axios.get('http://localhost:5500' + '/user/me', { withCredentials: true })
+        const res = await axios.get('https://stravaapi.sebtota.com' + '/user/me', { withCredentials: true })
         this.isAuthenticated = true
         this.calendar_authenticated = (res.data.calendar_authenticated)
         this.user_id = res.data.user_id
@@ -34,6 +34,9 @@ export const User = defineStore('User', {
     },
     isAuthenticatedCalendar () {
       return this.calendar_authenticated
+    },
+    userIsAuthenticated () {
+      return this.isAuthenticated
     }
   }
 })
