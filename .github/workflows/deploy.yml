@@ -60,4 +60,6 @@ jobs:
           --container-env "STRAVA_SUBSCRIPTION_ID=${{ secrets.STRAVA_SUBSCRIPTION_ID }}" \
           --container-env "GOOGLE_CLOUD_PROJECT=${{ secrets.GOOGLE_CLOUD_PROJECT }}" \
           --container-env "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
-          --container-env "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          --container-env "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+          --container-env "COOKIE_SECRET_KEY=${{ secrets.COOKIE_SECRET_KEY }}" \
+          --container-env "UI_BASE_URL=${{ secrets.UI_BASE_URL }}"
