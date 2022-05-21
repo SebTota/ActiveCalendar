@@ -32,7 +32,7 @@ export default defineComponent({
   },
   methods: {
     loginGoogleCalendar () {
-      window.location.href = 'https://stravaapi.sebtota.com' + '/auth/googleCalendar'
+      window.location.href = '/api/auth/googleCalendar'
     },
     showModal () {
       const node = document.createElement('script')
