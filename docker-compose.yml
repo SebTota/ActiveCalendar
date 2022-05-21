@@ -1,9 +1,0 @@
-version: '3.8'
-
-services:
-  web:
-    build: ./strava_calendar_summary_web_service
-    volumes:
-      - .:/strava_calendar_summary_web_service
-    ports:
-      - 8008:8000

@@ -51,7 +51,7 @@ export default defineComponent({
       if (this.user.isAuthenticated) {
         console.log('User is already logged in: ' + this.user.user_id)
       } else {
-        window.location.href = 'https://stravaapi.sebtota.com' + '/auth/strava'
+        window.location.href = '/api/auth/strava'
       }
     }
   }

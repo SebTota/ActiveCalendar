@@ -16,7 +16,7 @@ export const User = defineStore('User', {
   actions: {
     async getUser () {
       try {
-        const res = await axios.get('https://stravaapi.sebtota.com' + '/user/me', { withCredentials: true })
+        const res = await axios.get('/api/user/me', { withCredentials: true })
         this.isAuthenticated = true
         this.calendar_authenticated = (res.data.calendar_authenticated)
         this.user_id = res.data.user_id

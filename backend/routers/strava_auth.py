@@ -9,7 +9,7 @@ from stravalib.model import Athlete
 
 from strava_calendar_summary_data_access_layer import StravaCredentials, User, UserController
 from strava_calendar_summary_utils import StravaUtil
-from ..models import session_cookie, UserUI
+from backend.models import session_cookie, UserUI
 
 router = APIRouter()
 
@@ -20,7 +20,7 @@ def strava_get_authorization_token(request: Request):
     auth_url = strava_client.authorization_url(
             client_id=int(os.getenv('STRAVA_CLIENT_ID')),
             redirect_uri=request.url_for('strava_authorized_callback'),
-            scope=['activity:read_all'],)
+            scope=['activity:read_all'])
 
     return RedirectResponse(auth_url)
 
@@ -35,13 +35,13 @@ def strava_authorized_callback(request: Request):
 
     try:
         token_response = strava_client.exchange_code_for_token(
-            client_id=int(os.getenv('STRAVA_CLIENT_ID')), 
-            client_secret=os.getenv('STRAVA_CLIENT_SECRET'), 
+            client_id=int(os.getenv('STRAVA_CLIENT_ID')),
+            client_secret=os.getenv('STRAVA_CLIENT_SECRET'),
             code=code)
     except:
         logging.error('Could not authenticate user with Strava. Strava exchange code for token failed.')
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail='The authorization code provided was invalid. Please try authenticating with Strava again')
 
     access_token = token_response['access_token']

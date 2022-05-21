@@ -5,7 +5,7 @@ asgiref==3.5.0
 cachetools==5.0.0
 certifi==2021.10.8
 cffi==1.15.0
-charset-normalizer==2.0.12
+chardet>=3.0.2,<5;
 click==8.1.2
 cryptography==37.0.2
 fastapi==0.75.2

@@ -8,8 +8,7 @@ import os
 import google_auth_oauthlib.flow
 
 from strava_calendar_summary_data_access_layer import User, UserController, StravaCredentials
-from strava_calendar_summary_utils import StravaUtil
-from strava_calendar_summary_web_service.models import session_cookie
+from backend.models import session_cookie
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 GOOGLE_CONFIG_PATH = os.path.join(ROOT_DIR, '../../client_secret.json')
