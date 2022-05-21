@@ -7,3 +7,4 @@ secrets.sh
 google_creds.json
 cert.pem
 key.pem
+/nginx/bundle.pem

@@ -8,4 +8,5 @@ RUN pip install --upgrade -r /backend/requirements.txt
 COPY /backend /backend
 COPY /frontend/dist /frontend
 
-COPY nginx-config.json /docker-entrypoint.d/config.json
+COPY nginx/config.json /docker-entrypoint.d/config.json
+COPY nginx/bundle.pem /docker-entrypoint.d/bundle.pem
