@@ -5,7 +5,6 @@ COPY /backend/requirements.txt /backend/requirements.txt
 COPY client_secret.json client_secret.json
 
 RUN pip install --upgrade -r /backend/requirements.txt
-#RUN npm --prefix frontend/ run build
 
 COPY /backend /backend
 COPY /frontend/dist /frontend

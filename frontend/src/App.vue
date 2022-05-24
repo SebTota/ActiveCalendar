@@ -1,8 +1,8 @@
 <template>
-  <div class="container-fluid vh-100 d-flex flex-column">
-  <NavBar/>
-  <router-view/>
-</div>
+  <div class="h-100 d-flex flex-column">
+    <NavBar/>
+    <router-view/>
+  </div>
 </template>
 
 <script lang="ts">

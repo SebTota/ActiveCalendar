@@ -9,7 +9,8 @@ export const User = defineStore('User', {
     calendar_authenticated: false,
     user_id: null,
     first_name: '',
-    last_name: ''
+    last_name: '',
+    calendar_preferences: {}
   }),
   getters: {
   },
@@ -22,6 +23,7 @@ export const User = defineStore('User', {
         this.user_id = res.data.user_id
         this.first_name = res.data.first_name
         this.last_name = res.data.last_name
+        this.calendar_preferences = res.data.calendar_preferences
       } catch (err) {
         this.isAuthenticated = false
       }
@@ -37,6 +39,9 @@ export const User = defineStore('User', {
     },
     userIsAuthenticated () {
       return this.isAuthenticated
+    },
+    getCalendarPreferences () {
+      return this.calendar_preferences
     }
   }
 })

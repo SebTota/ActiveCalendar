@@ -9,7 +9,7 @@ from stravalib.model import Athlete
 
 from strava_calendar_summary_data_access_layer import StravaCredentials, User, UserController
 from strava_calendar_summary_utils import StravaUtil
-from backend.models import session_cookie, UserUI
+from backend.models import user_auth, UserUI
 
 router = APIRouter()
 
@@ -55,10 +55,10 @@ def strava_authorized_callback(request: Request):
     request.session['user_id'] = athlete.id
 
     user = User(str(athlete.id), athlete.firstname, athlete.lastname, strava_credentials=strava_creds)
-    UserController().update(user.user_id, user)
+    UserController().insert(user.user_id, user)
 
     response: RedirectResponse = RedirectResponse(os.getenv('UI_BASE_URL'))
-    auth_cookie_encrypted = session_cookie.update_session_cookie(session_cookie.SessionCookie(user.user_id, expires_at))
+    auth_cookie_encrypted = user_auth.update_session_cookie(user_auth.UserAuth(user.user_id, expires_at))
     response.set_cookie(key='Authentication', value=auth_cookie_encrypted, expires=expires_at, httponly=True)
     return response
 
@@ -69,7 +69,7 @@ async def get_strava_user_info(response: Response, Authentication: Optional[str]
     if Authentication is None:
         raise HTTPException(status_code=401, detail='User not signed in')
 
-    auth_cookie: session_cookie.SessionCookie = session_cookie.decrypt_session_cookie(Authentication)
+    auth_cookie: user_auth.UserAuth = user_auth.decrypt_session_cookie(Authentication)
 
     user: User = UserController().get_by_id(auth_cookie.user_id)
     if user is None:
@@ -84,14 +84,15 @@ async def get_strava_user_info(response: Response, Authentication: Optional[str]
 
         user.strava_credentials = refreshed_credentials  # Creds already updated in db so no need to re-update
 
-    auth_cookie_encrypted = session_cookie.update_session_cookie(
-        session_cookie.SessionCookie(user.user_id, user.strava_credentials.expiry_date))
+    auth_cookie_encrypted = user_auth.update_session_cookie(
+        user_auth.UserAuth(user.user_id, user.strava_credentials.expiry_date))
 
     resp_obj: UserUI = UserUI(user_id=user.user_id,
                               first_name=user.first_name,
                               last_name=user.last_name,
                               strava_authenticated=user.strava_credentials is not None,
-                              calendar_authenticated=user.calendar_credentials is not None)
+                              calendar_authenticated=user.calendar_credentials is not None,
+                              calendar_preferences=user.calendar_preferences.to_dict())
 
     response.set_cookie(key='Authentication', value=auth_cookie_encrypted,
                         expires=user.strava_credentials.expiry_date, httponly=True)

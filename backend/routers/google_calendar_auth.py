@@ -1,14 +1,12 @@
-from typing import Optional
+from backend.models import user_auth
+from strava_calendar_summary_data_access_layer import User, UserController
 
+from typing import Optional
 from fastapi import APIRouter, Request, HTTPException, Cookie
 from fastapi.responses import RedirectResponse
-import json
 import os
-
 import google_auth_oauthlib.flow
 
-from strava_calendar_summary_data_access_layer import User, UserController, StravaCredentials
-from backend.models import session_cookie
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 GOOGLE_CONFIG_PATH = os.path.join(ROOT_DIR, '../../client_secret.json')
@@ -41,7 +39,7 @@ async def google_calendar_auth_callback(request: Request, Authentication: Option
     if Authentication is None:
         raise HTTPException(status_code=401, detail='User not signed in')
 
-    auth_cookie: session_cookie.SessionCookie = session_cookie.decrypt_session_cookie(Authentication)
+    auth_cookie: user_auth.UserAuth = user_auth.decrypt_session_cookie(Authentication)
 
     if 'google_auth_state' not in request.session:
         raise HTTPException(status_code=400, detail='Please authenticate with Google Calendar')

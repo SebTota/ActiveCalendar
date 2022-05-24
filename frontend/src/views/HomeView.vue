@@ -1,6 +1,6 @@
 <template>
-<div style="height: 100vh; width: 100%;">
-    <div id="intro-container" class="container">
+<div class="w-100 h-100">
+    <div id="intro-container" class="container w-100 h-100">
         <div class="row" style="height: 100%;">
             <div class="col-sm-8 home-page-column home-page-column-left">
               <div>

@@ -7,3 +7,4 @@ class UserUI(BaseModel):
     last_name: str
     strava_authenticated: bool
     calendar_authenticated: bool
+    calendar_preferences: dict
