@@ -21,7 +21,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import Constants from '@/constants/constants'
 
 export default defineComponent({
   name: 'CalendarAuthSetupModal',
@@ -33,7 +32,7 @@ export default defineComponent({
   },
   methods: {
     loginGoogleCalendar () {
-      window.location.href = Constants.API_BASE_PATH + '/api/auth/googleCalendar'
+      window.location.href = '/api/auth/googleCalendar'
     },
     showModal () {
       const node = document.createElement('script')

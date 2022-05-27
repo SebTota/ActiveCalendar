@@ -28,7 +28,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { User } from '@/store/user'
-import Constants from '@/constants/constants'
 
 export default defineComponent({
   name: 'HomeView',
@@ -52,7 +51,7 @@ export default defineComponent({
       if (this.user.isAuthenticated) {
         console.log('User is already logged in: ' + this.user.user_id)
       } else {
-        window.location.href = Constants.API_BASE_PATH + '/api/auth/strava'
+        window.location.href = '/api/auth/strava'
       }
     }
   }
