@@ -51,15 +51,20 @@ export default defineComponent({
   },
   methods: {
     enableSummary () {
-      axios.post(`/api/summary/template/update?summary_type=${this.summaryType}&enabled=true`, {}, { withCredentials: true }).then(() => {
-        this.summaryEnabled = true
+      const body = {
+        summary_type: this.summaryType,
+        enabled: 'true'
+      }
+      axios.post('/api/summary/template/update', body, { withCredentials: true }).then(() => {
+        this.summaryEnabled = false
       })
     },
     disableSummary () {
       const body = {
+        summary_type: this.summaryType,
         enabled: 'false'
       }
-      axios.post(`/api/summary/template/update?summary_type=${this.summaryType}&enabled=false`, {}, { withCredentials: true }).then(() => {
+      axios.post('/api/summary/template/update', body, { withCredentials: true }).then(() => {
         this.summaryEnabled = false
       })
     },
@@ -68,10 +73,15 @@ export default defineComponent({
     },
     saveTemplate () {
       this.validationErrorMessage = ''
-      const titleTemplateVal = (this.$refs.titleTemplateBuilderInput as any).value
-      const descriptionTemplateVal = (this.$refs.templateBuilderInput as any).value
-      const url = `/api/summary/template/update?summary_type=${this.summaryType}&enabled=true&title_template=${titleTemplateVal}&description_template=${descriptionTemplateVal}`
-      axios.post(url, {}, { withCredentials: true }).catch((err) => {
+      const body = {
+        summary_type: this.summaryType,
+        enabled: 'true',
+        title_template: (this.$refs.titleTemplateBuilderInput as any).value,
+        description_template: (this.$refs.templateBuilderInput as any).value
+      }
+      console.log(body)
+      const url = '/api/summary/template/update'
+      axios.post(url, body, { withCredentials: true }).catch((err) => {
         if (err.response.status === 400) {
           const invalidKeys = err.response.data.invalid_keys
           this.validationErrorMessage = 'Invalid keys: ' + invalidKeys.join(', ')

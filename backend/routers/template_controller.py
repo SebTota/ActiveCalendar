@@ -1,3 +1,5 @@
+from typing import Union
+
 from backend.models import user_auth
 
 from strava_calendar_summary_data_access_layer import User, UserController, StravaCredentials, CalendarPreferences
@@ -6,45 +8,32 @@ from strava_calendar_summary_utils import template_builder
 from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.responses import JSONResponse
 import logging
+from pydantic import BaseModel
 import json
 
 router = APIRouter(prefix='/summary/template')
 
 
-@router.get('/verify')
-async def verify_template(summary_type: str, title_template: str, description_template: str):
-    await verify_summary_type(summary_type)
-    invalid_keys: list = verify_templates(title_template, description_template, summary_type != 'per_activity')
-
-    if len(invalid_keys) > 0:
-        return JSONResponse(status_code=400, content={
-            'error': 'Invalid keys found in the template',
-            'invalid_keys': invalid_keys
-        })
-    else:
-        return ''
+class Template(BaseModel):
+    summary_type: str
+    enabled: Union[bool, None] = True
+    title_template: Union[str, None] = None
+    description_template: Union[str, None] = None
 
 
 @router.post('/update')
-async def update_template(summary_type: str, enabled: bool, title_template: str = None, description_template: str = None, auth: user_auth.UserAuth = Depends(user_auth.get_signed_in_user_auth)):
+async def update_template(template: Template, auth: user_auth.UserAuth = Depends(user_auth.get_signed_in_user_auth)):
     """
     Update the summary template for a calendar event
-    :param enabled:
-    :param description_template:
-    :param title_template:
-    :param summary_type: per_run, daily, or weekly calendar summary template type
-    :param request: the HTTP request whose body contains what is going to be updated
-        {
-            'enabled': str // 'true' to enable or any other string to disable
-            'title_template': str // Optional
-            'description_template': str // Optional
-        }
+    :param template: information on what is being updated in the template
     :param auth: the signed-in user whose template is going to update
     :return: status code
     """
-    await verify_summary_type(summary_type)
+    await verify_summary_type(template.summary_type)
 
-    invalid_keys: list = verify_templates(title_template, description_template, summary_type != 'per_activity')
+    invalid_keys: list = verify_templates(template.title_template,
+                                          template.description_template,
+                                          template.summary_type != 'per_activity')
 
     if len(invalid_keys) > 0:
         return JSONResponse(status_code=400, content={
@@ -54,6 +43,11 @@ async def update_template(summary_type: str, enabled: bool, title_template: str 
 
     user: User = UserController().get_by_id(auth.user_id)
     calendar_preferences: CalendarPreferences = user.calendar_preferences
+
+    summary_type = template.summary_type
+    enabled = template.enabled
+    title_template = template.title_template
+    description_template = template.description_template
 
     if summary_type == 'per_activity':
         calendar_preferences.per_run_summary_enabled = enabled
