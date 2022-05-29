@@ -56,7 +56,7 @@ export default defineComponent({
         enabled: 'true'
       }
       axios.post('/api/summary/template/update', body, { withCredentials: true }).then(() => {
-        this.summaryEnabled = false
+        this.summaryEnabled = true
       })
     },
     disableSummary () {
@@ -79,7 +79,6 @@ export default defineComponent({
         title_template: (this.$refs.titleTemplateBuilderInput as any).value,
         description_template: (this.$refs.templateBuilderInput as any).value
       }
-      console.log(body)
       const url = '/api/summary/template/update'
       axios.post(url, body, { withCredentials: true }).catch((err) => {
         if (err.response.status === 400) {
