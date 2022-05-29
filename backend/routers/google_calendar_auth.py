@@ -1,5 +1,6 @@
 from backend.models import user_auth
 from strava_calendar_summary_data_access_layer import User, UserController
+from strava_calendar_summary_utils.google_calendar.google_calendar_util import SCOPES as GOOGLE_CALENDAR_AUTH_SCOPES
 
 from typing import Optional
 from fastapi import APIRouter, Request, HTTPException, Cookie
@@ -10,7 +11,6 @@ import google_auth_oauthlib.flow
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 GOOGLE_CONFIG_PATH = os.path.join(ROOT_DIR, '../../client_secret.json')
-GOOGLE_CALENDAR_AUTH_SCOPES = ['https://www.googleapis.com/auth/calendar.app.created']
 
 router = APIRouter()
 
