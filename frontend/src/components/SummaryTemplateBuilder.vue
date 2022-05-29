@@ -17,11 +17,25 @@
       </div>
     </div>
     <div>
-      <button v-if="!summaryEnabled" @click="enableSummary()" type="button" class="btn btn-info">Enable</button>
+      <div v-if="!summaryEnabled">
+        <button v-if="!toggleTemplateEnabledButtonsLoading" @click="enableSummary()" type="button" class="btn btn-info">Enable</button>
+        <button v-else class="btn btn-info" type="button" disabled>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Loading...
+        </button>
+      </div>
       <div v-else>
         <div v-if="showValidationError()" class="alert alert-danger" role="alert">{{ this.validationErrorMessage }}</div>
-        <button type="button" class="btn btn-info" @click="saveTemplate()">Save</button>
-        <button type="button" @click="disableSummary()" class="btn btn-warning ml-3">Disable</button>
+        <button v-if="!saveButtonLoading" type="button" class="btn btn-info" @click="saveTemplate()">Save</button>
+        <button v-else class="btn btn-info" type="button" disabled>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Loading...
+        </button>
+        <button v-if="!toggleTemplateEnabledButtonsLoading" type="button" @click="disableSummary()" class="btn btn-warning ml-3">Disable</button>
+        <button v-else class="btn btn-warning ml-3" type="button" disabled>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Loading...
+        </button>
       </div>
     </div>
   </div>
@@ -46,26 +60,32 @@ export default defineComponent({
       summaryEnabled: this.summary_enabled,
       titleTemplate: this.title_template,
       descriptionTemplate: this.description_template,
-      summaryType: this.summary_type
+      summaryType: this.summary_type,
+      saveButtonLoading: false,
+      toggleTemplateEnabledButtonsLoading: false
     }
   },
   methods: {
     enableSummary () {
+      this.toggleTemplateEnabledButtonsLoading = true
       const body = {
         summary_type: this.summaryType,
         enabled: 'true'
       }
       axios.post('/api/summary/template/update', body, { withCredentials: true }).then(() => {
         this.summaryEnabled = true
+        this.toggleTemplateEnabledButtonsLoading = false
       })
     },
     disableSummary () {
+      this.toggleTemplateEnabledButtonsLoading = true
       const body = {
         summary_type: this.summaryType,
         enabled: 'false'
       }
       axios.post('/api/summary/template/update', body, { withCredentials: true }).then(() => {
         this.summaryEnabled = false
+        this.toggleTemplateEnabledButtonsLoading = false
       })
     },
     showValidationError () {
@@ -73,18 +93,23 @@ export default defineComponent({
     },
     saveTemplate () {
       this.validationErrorMessage = ''
+      this.saveButtonLoading = true
       const body = {
         summary_type: this.summaryType,
         enabled: 'true',
         title_template: (this.$refs.titleTemplateBuilderInput as any).value,
         description_template: (this.$refs.templateBuilderInput as any).value
       }
-      const url = '/api/summary/template/update'
-      axios.post(url, body, { withCredentials: true }).catch((err) => {
+
+      axios.post('/api/summary/template/update', body, { withCredentials: true }).catch((err) => {
+        this.saveButtonLoading = false
         if (err.response.status === 400) {
           const invalidKeys = err.response.data.invalid_keys
           this.validationErrorMessage = 'Invalid keys: ' + invalidKeys.join(', ')
         }
+      }).then(() => {
+        // Always executed
+        this.saveButtonLoading = false
       })
     }
   }
