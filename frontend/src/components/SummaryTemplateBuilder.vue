@@ -8,11 +8,11 @@
           <h5>Title Template</h5>
           <input ref="titleTemplateBuilderInput" id="titleTemplateBuilderInput" type="text" class="form-control"
                  aria-label="calendar event title template" aria-describedby="basic-addon1"
-                 v-model="this.summaryTitleTemplate">
+                 v-model="this.titleTemplate">
         </div>
         <div>
           <h5>Calendar Event Template</h5>
-          <textarea ref="templateBuilderInput" class="form-control" aria-label="summary text area" rows="7" v-model="this.summaryTemplate"></textarea>
+          <textarea ref="templateBuilderInput" class="form-control" aria-label="summary text area" rows="7" v-model="this.descriptionTemplate"></textarea>
         </div>
       </div>
     </div>
@@ -35,8 +35,8 @@ export default defineComponent({
   props: {
     title: String,
     summary_enabled: Boolean,
-    summary_title_template: String,
-    summary_template: String,
+    title_template: String,
+    description_template: String,
     summary_type: String
   },
   data () {
@@ -44,8 +44,8 @@ export default defineComponent({
       readyToSave: false,
       validationErrorMessage: '',
       summaryEnabled: this.summary_enabled,
-      summaryTitleTemplate: this.summary_title_template,
-      summaryTemplate: this.summary_template,
+      titleTemplate: this.title_template,
+      descriptionTemplate: this.description_template,
       summaryType: this.summary_type
     }
   },
@@ -69,8 +69,8 @@ export default defineComponent({
     saveTemplate () {
       this.validationErrorMessage = ''
       const titleTemplateVal = (this.$refs.titleTemplateBuilderInput as any).value
-      const summaryTemplateVal = (this.$refs.templateBuilderInput as any).value
-      const url = `/api/summary/template/update?summary_type=${this.summaryType}&enabled=true&title_template=${titleTemplateVal}&summary_template=${summaryTemplateVal}`
+      const descriptionTemplateVal = (this.$refs.templateBuilderInput as any).value
+      const url = `/api/summary/template/update?summary_type=${this.summaryType}&enabled=true&title_template=${titleTemplateVal}&description_template=${descriptionTemplateVal}`
       axios.post(url, {}, { withCredentials: true }).catch((err) => {
         if (err.response.status === 400) {
           const invalidKeys = err.response.data.invalid_keys

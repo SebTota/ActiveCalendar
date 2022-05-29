@@ -12,9 +12,9 @@ router = APIRouter(prefix='/summary/template')
 
 
 @router.get('/verify')
-async def verify_summary_template(summary_type: str, title_template: str, summary_template: str):
+async def verify_template(summary_type: str, title_template: str, description_template: str):
     await verify_summary_type(summary_type)
-    invalid_keys: list = verify_templates(title_template, summary_template)
+    invalid_keys: list = verify_templates(title_template, description_template, summary_type != 'per_activity')
 
     if len(invalid_keys) > 0:
         return JSONResponse(status_code=400, content={
@@ -26,25 +26,25 @@ async def verify_summary_template(summary_type: str, title_template: str, summar
 
 
 @router.post('/update')
-async def update_summary_template(summary_type: str, enabled: bool, title_template: str = None, summary_template: str = None, auth: user_auth.UserAuth = Depends(user_auth.get_signed_in_user_auth)):
+async def update_template(summary_type: str, enabled: bool, title_template: str = None, description_template: str = None, auth: user_auth.UserAuth = Depends(user_auth.get_signed_in_user_auth)):
     """
     Update the summary template for a calendar event
     :param enabled:
-    :param summary_template:
+    :param description_template:
     :param title_template:
     :param summary_type: per_run, daily, or weekly calendar summary template type
     :param request: the HTTP request whose body contains what is going to be updated
         {
             'enabled': str // 'true' to enable or any other string to disable
             'title_template': str // Optional
-            'summary_template': str // Optional
+            'description_template': str // Optional
         }
     :param auth: the signed-in user whose template is going to update
     :return: status code
     """
     await verify_summary_type(summary_type)
 
-    invalid_keys: list = verify_templates(title_template, summary_template)
+    invalid_keys: list = verify_templates(title_template, description_template, summary_type != 'per_activity')
 
     if len(invalid_keys) > 0:
         return JSONResponse(status_code=400, content={
@@ -59,36 +59,36 @@ async def update_summary_template(summary_type: str, enabled: bool, title_templa
         calendar_preferences.per_run_summary_enabled = enabled
         if title_template is not None:
             calendar_preferences.per_run_title_template = title_template
-        if summary_template is not None:
-            calendar_preferences.per_run_summary_template = summary_template
+        if description_template is not None:
+            calendar_preferences.per_run_description_template = description_template
     elif summary_type == 'daily':
         calendar_preferences.daily_run_summary_enabled = enabled
         if title_template is not None:
             calendar_preferences.daily_run_title_template = title_template
-        if summary_template is not None:
-            calendar_preferences.daily_run_summary_template = summary_template
+        if description_template is not None:
+            calendar_preferences.daily_run_description_template = description_template
     else:
         calendar_preferences.weekly_run_summary_enabled = enabled
         if title_template is not None:
             calendar_preferences.weekly_run_title_template = title_template
-        if summary_template is not None:
-            calendar_preferences.weekly_run_summary_template = summary_template
+        if description_template is not None:
+            calendar_preferences.weekly_run_description_template = description_template
 
     UserController().update(user.user_id, user)
     return 'Updated {} summary template'.format(summary_type)
 
 
-def verify_templates(title_template: str, summary_template: str) -> list:
+def verify_templates(title_template: str, description_template: str, is_summary_template: bool) -> list:
     title_template_invalid_keys = []
-    summary_template_invalid_keys = []
+    description_template_invalid_keys = []
 
     if title_template is not None:
-        title_template_invalid_keys = template_builder.verify_template(title_template)
+        title_template_invalid_keys = template_builder.verify_template(title_template, is_summary_template)
 
-    if summary_template is not None:
-        summary_template_invalid_keys = template_builder.verify_template(summary_template)
+    if description_template is not None:
+        description_template_invalid_keys = template_builder.verify_template(description_template, is_summary_template)
 
-    return list(set(title_template_invalid_keys + summary_template_invalid_keys))
+    return list(set(title_template_invalid_keys + description_template_invalid_keys))
 
 
 async def verify_summary_type(summary_type):

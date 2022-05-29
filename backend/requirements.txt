@@ -5,7 +5,7 @@ asgiref==3.5.0
 cachetools==5.0.0
 certifi==2021.10.8
 cffi==1.15.0
-chardet>=3.0.2,<5;
+charset-normalizer==2.0.12
 click==8.1.2
 cryptography==37.0.2
 fastapi==0.75.2
@@ -52,7 +52,7 @@ starlette==0.17.1
 -e git+https://github.com/SebTota/StravaCalendarSummaryDataAccessLayer#egg=strava_calendar_summary_data_access_layer
 -e git+https://github.com/SebTota/StravaCalendarSummaryUtils#egg=strava_calendar_summary_utils
 stravalib==0.10.4
-typing-extensions==4.2.0
+typing_extensions==4.2.0
 units==0.7
 uritemplate==4.1.1
 urllib3==1.26.9

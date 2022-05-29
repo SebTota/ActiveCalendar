@@ -45,14 +45,14 @@
               <div v-if="retrievedUser" class="tab-pane active" id="perRunSummary">
                 <div v-if="this.calendar_preferences['per_run_summary_enabled'] === true">
                   <SummaryTemplateBuilder summary_enabled
-                                          :summary_template="this.calendar_preferences['per_run_summary_template']"
-                                          :summary_title_template="this.calendar_preferences['per_run_title_template']"
+                                          :description_template="this.calendar_preferences['per_run_description_template']"
+                                          :title_template="this.calendar_preferences['per_run_title_template']"
                                           title="Per Activity Calendar Event Template"
                                           summary_type="per_activity"/>
                 </div>
                 <div v-else>
-                  <SummaryTemplateBuilder :summary_template="this.calendar_preferences['per_run_summary_template']"
-                                          :summary_title_template="this.calendar_preferences['per_run_title_template']"
+                  <SummaryTemplateBuilder :description_template="this.calendar_preferences['per_run_description_template']"
+                                          :title_template="this.calendar_preferences['per_run_title_template']"
                                           title="Per Activity Calendar Event Template"
                                           summary_type="per_activity"/>
                 </div>
@@ -61,14 +61,14 @@
               <div v-if="retrievedUser" class="tab-pane" id="dailySummary">
                 <div v-if="this.calendar_preferences['daily_run_summary_enabled'] === true">
                   <SummaryTemplateBuilder summary_enabled
-                                          :summary_template="this.calendar_preferences['daily_run_summary_template']"
-                                          :summary_title_template="this.calendar_preferences['daily_run_title_template']"
+                                          :description_template="this.calendar_preferences['daily_run_description_template']"
+                                          :title_template="this.calendar_preferences['daily_run_title_template']"
                                           title="Daily Calendar Event Template"
                                           summary_type="daily"/>
                 </div>
                 <div v-else>
-                  <SummaryTemplateBuilder :summary_template="this.calendar_preferences['daily_run_summary_template']"
-                                          :summary_title_template="this.calendar_preferences['daily_run_title_template']"
+                  <SummaryTemplateBuilder :description_template="this.calendar_preferences['daily_run_description_template']"
+                                          :title_template="this.calendar_preferences['daily_run_title_template']"
                                           title="Daily Calendar Event Template"
                                           summary_type="daily"/>
                 </div>
@@ -77,14 +77,14 @@
               <div v-if="retrievedUser" class="tab-pane" id="weeklySummary">
                 <div v-if="this.calendar_preferences['weekly_run_summary_enabled'] === true">
                   <SummaryTemplateBuilder summary_enabled
-                                          :summary_template="this.calendar_preferences['weekly_run_summary_template']"
-                                          :summary_title_template="this.calendar_preferences['weekly_run_title_template']"
+                                          :description_template="this.calendar_preferences['weekly_run_description_template']"
+                                          :title_template="this.calendar_preferences['weekly_run_title_template']"
                                           title="Weekly Calendar Event Template"
                                           summary_type="weekly"/>
                 </div>
                 <div v-else>
-                  <SummaryTemplateBuilder :summary_template="this.calendar_preferences['weekly_run_summary_template']"
-                                          :summary_title_template="this.calendar_preferences['weekly_run_title_template']"
+                  <SummaryTemplateBuilder :description_template="this.calendar_preferences['weekly_run_description_template']"
+                                          :title_template="this.calendar_preferences['weekly_run_title_template']"
                                           title="Weekly Calendar Event Template"
                                           summary_type="weekly"/>
                 </div>
