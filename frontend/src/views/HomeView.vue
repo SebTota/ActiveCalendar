@@ -15,7 +15,7 @@
               </div>
             </div>
             <div class="col-sm-4 home-page-column home-page-column-right">
-                <img class="into-example-calendar-img" src="@/assets/File_000.png" />
+                <img class="into-example-calendar-img" src="@/assets/mock_one.png" />
             </div>
         </div>
     </div>
