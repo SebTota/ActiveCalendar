@@ -12,6 +12,3 @@ Even on a training plan, keeping track of your daily and weekly millage, pace, a
 * [Data Access Layer](https://github.com/SebTota/StravaCalendarSummaryDataAccessLayer)
 * [Utility Package](https://github.com/SebTota/StravaCalendarSummaryUtils)
 * [Event Processor Cloud Function](https://github.com/SebTota/StravaCalendarSummaryEventProcessor)
-
-### Workflow
-![workflow](./workflow.png)
