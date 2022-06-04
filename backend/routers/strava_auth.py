@@ -75,7 +75,7 @@ async def get_strava_user_info(response: Response, Authentication: Optional[str]
     try:
         user: User = UserController().get_by_id(auth_cookie.user_id)
     except Exception as e:
-        logging.exception('Failed retrieving user: {} while getting session data'.format(auth_cookie.user_id) + str(e))
+        logging.exception('Failed retrieving user: {} while getting session data\n'.format(auth_cookie.user_id) + str(e))
         raise HTTPException(status_code=500, detail='An error occured while retrieving the signed in user details.')
 
 

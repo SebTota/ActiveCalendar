@@ -27,7 +27,8 @@ async def google_calendar_auth(request: Request, Authentication: Optional[str] =
 
     flow.redirect_uri = request.url_for('google_calendar_auth_callback')
     authorization_url, state = flow.authorization_url(
-        access_type='offline'
+        access_type='offline',
+        prompt='consent'
     )
 
     request.session['google_auth_state'] = state
