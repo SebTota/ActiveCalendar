@@ -19,7 +19,7 @@ def strava_get_authorization_token(request: Request):
     auth_url = Client().authorization_url(
             client_id=int(os.getenv('STRAVA_CLIENT_ID')),
             redirect_uri=request.url_for('strava_authorized_callback'),
-            scope=['activity:read_all'])
+            scope=['read', 'activity:read_all'])
 
     print(auth_url)
 
