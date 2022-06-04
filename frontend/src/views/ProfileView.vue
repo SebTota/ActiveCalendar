@@ -41,56 +41,32 @@
               </ul>
             </div>
 
-            <div class="card-body tab-content">
-              <div v-if="retrievedUser" class="tab-pane active" id="perRunSummary">
-                <div v-if="this.calendar_preferences['per_run_summary_enabled'] === true">
-                  <SummaryTemplateBuilder summary_enabled
+            <div v-if="retrievedUser" class="card-body tab-content">
+              <div class="tab-pane active" id="perRunSummary">
+                <SummaryTemplateBuilder :summary_enabled="this.calendar_preferences['per_run_summary_enabled'] === true"
                                           :description_template="this.calendar_preferences['per_run_description_template']"
                                           :title_template="this.calendar_preferences['per_run_title_template']"
                                           title="Per Activity Calendar Event Template"
                                           summary_type="per_activity"/>
-                </div>
-                <div v-else>
-                  <SummaryTemplateBuilder :description_template="this.calendar_preferences['per_run_description_template']"
-                                          :title_template="this.calendar_preferences['per_run_title_template']"
-                                          title="Per Activity Calendar Event Template"
-                                          summary_type="per_activity"/>
-                </div>
               </div>
 
-              <div v-if="retrievedUser" class="tab-pane" id="dailySummary">
-                <div v-if="this.calendar_preferences['daily_run_summary_enabled'] === true">
-                  <SummaryTemplateBuilder summary_enabled
+              <div class="tab-pane" id="dailySummary">
+                <SummaryTemplateBuilder :summary_enabled="this.calendar_preferences['daily_run_summary_enabled'] === true"
                                           :description_template="this.calendar_preferences['daily_run_description_template']"
                                           :title_template="this.calendar_preferences['daily_run_title_template']"
                                           title="Daily Calendar Event Template"
                                           summary_type="daily"/>
-                </div>
-                <div v-else>
-                  <SummaryTemplateBuilder :description_template="this.calendar_preferences['daily_run_description_template']"
-                                          :title_template="this.calendar_preferences['daily_run_title_template']"
-                                          title="Daily Calendar Event Template"
-                                          summary_type="daily"/>
-                </div>
               </div>
 
-              <div v-if="retrievedUser" class="tab-pane" id="weeklySummary">
-                <div v-if="this.calendar_preferences['weekly_run_summary_enabled'] === true">
-                  <SummaryTemplateBuilder summary_enabled
+              <div class="tab-pane" id="weeklySummary">
+                <SummaryTemplateBuilder :summary_enabled="this.calendar_preferences['weekly_run_summary_enabled'] === true"
                                           :description_template="this.calendar_preferences['weekly_run_description_template']"
                                           :title_template="this.calendar_preferences['weekly_run_title_template']"
                                           title="Weekly Calendar Event Template"
                                           summary_type="weekly"/>
-                </div>
-                <div v-else>
-                  <SummaryTemplateBuilder :description_template="this.calendar_preferences['weekly_run_description_template']"
-                                          :title_template="this.calendar_preferences['weekly_run_title_template']"
-                                          title="Weekly Calendar Event Template"
-                                          summary_type="weekly"/>
-                </div>
               </div>
 
-              <div v-if="retrievedUser" class="tab-pane" id="account">
+              <div class="tab-pane" id="account">
                 <h6>ACCOUNT SETTINGS</h6>
                 <hr>
                 <p>To delete your account, visit the Strava <a href="https://www.strava.com/settings/apps" target="_blank">My Apps</a> page and click on "Revoke Access"</p>
