@@ -5,37 +5,31 @@ from stravalib.client import Client
 import logging
 import os
 import time
-import traceback
 from stravalib.model import Athlete
 
 from strava_calendar_summary_data_access_layer import StravaCredentials, User, UserController
 from strava_calendar_summary_utils import StravaUtil
 from backend.models import user_auth, UserUI
 
-router = APIRouter()
+router = APIRouter(tags=["Strava Auth"])
 
 
 @router.get('/auth/strava')
 def strava_get_authorization_token(request: Request):
-    strava_client = Client()  # TODO: Move this to utils package
-    auth_url = strava_client.authorization_url(
+    auth_url = Client().authorization_url(
             client_id=int(os.getenv('STRAVA_CLIENT_ID')),
             redirect_uri=request.url_for('strava_authorized_callback'),
             scope=['activity:read_all'])
 
-    return RedirectResponse(auth_url)
+    print(auth_url)
+
+    return RedirectResponse(auth_url + '&approval_prompt=auto')
 
 
 @router.get('/auth/strava/callback')
-def strava_authorized_callback(request: Request):
-    if 'code' not in request.query_params:
-        return RedirectResponse(os.getenv('UI_BASE_URL'))
-    code = request.query_params['code']
-
-    strava_client = Client()  # TODO: Move this to utils package
-
+def strava_authorized_callback(code: str):
     try:
-        token_response = strava_client.exchange_code_for_token(
+        token_response = Client().exchange_code_for_token(
             client_id=int(os.getenv('STRAVA_CLIENT_ID')),
             client_secret=os.getenv('STRAVA_CLIENT_SECRET'),
             code=code)
@@ -49,14 +43,21 @@ def strava_authorized_callback(request: Request):
     refresh_token = token_response['refresh_token']
     expires_at = token_response['expires_at']
 
-    strava_creds: StravaCredentials = StravaCredentials(access_token, refresh_token, expires_at)
-    strava_util = StravaUtil(strava_creds)
+    strava_credentials: StravaCredentials = StravaCredentials(access_token, refresh_token, expires_at)
+    strava_util = StravaUtil(strava_credentials)
     athlete: Athlete = strava_util.get_athlete()
+    athlete_id: str = str(athlete.id)
 
-    request.session['user_id'] = athlete.id
+    user: User = UserController().get_by_id(athlete_id)
 
-    user = User(str(athlete.id), athlete.firstname, athlete.lastname, strava_credentials=strava_creds)
-    UserController().insert(user.user_id, user)
+    if user is None:
+        # User is signing up for the first time. Sign up
+        user = User(athlete_id, athlete.firstname, athlete.lastname, strava_credentials=strava_credentials)
+        UserController().insert(user.user_id, user)
+    else:
+        # Returning user. Login in
+        user.strava_credentials = strava_credentials
+        UserController().update(user.user_id, user)
 
     response: RedirectResponse = RedirectResponse(os.getenv('UI_BASE_URL'))
     auth_cookie_encrypted = user_auth.update_session_cookie(user_auth.UserAuth(user.user_id, expires_at))
