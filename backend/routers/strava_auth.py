@@ -5,6 +5,7 @@ from stravalib.client import Client
 import logging
 import os
 import time
+import traceback
 from stravalib.model import Athlete
 
 from strava_calendar_summary_data_access_layer import StravaCredentials, User, UserController
@@ -71,7 +72,13 @@ async def get_strava_user_info(response: Response, Authentication: Optional[str]
 
     auth_cookie: user_auth.UserAuth = user_auth.decrypt_session_cookie(Authentication)
 
-    user: User = UserController().get_by_id(auth_cookie.user_id)
+    try:
+        user: User = UserController().get_by_id(auth_cookie.user_id)
+    except Exception as e:
+        logging.exception('Failed retrieving user: {} while getting session data'.format(auth_cookie.user_id) + str(e))
+        raise HTTPException(status_code=500, detail='An error occured while retrieving the signed in user details.')
+
+
     if user is None:
         raise HTTPException(status_code=401, detail='User does not exist')
 
