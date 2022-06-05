@@ -5,7 +5,7 @@
             <div class="col-sm-8 home-page-column home-page-column-left">
               <div>
                 <div>
-                  <p id="intro-statement">The Calendar Running Summary tool allows you to stay on top of your training at a quick glance.</p>
+                  <p id="intro-statement">Activity Calendar allows you to stay on top of your training at a quick glance.</p>
                 </div>
                 <div v-if="retrievedUser && !isLoggedIn()">
                   <button @click="login()">
