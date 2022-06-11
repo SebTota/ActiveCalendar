@@ -23,6 +23,7 @@
       <h2>Activities</h2>
       <p>If you track multiple types of activities and want to separate the information for each activity type
       in your calendar events, use activity types to customize your template even more by separating each activities data.</p>
+      <ActivityListDisplay :activities="activityTypes" />
     </div>
   </div>
 </template>
@@ -31,17 +32,20 @@
 import { defineComponent } from 'vue'
 import Constants from '@/constants/constants'
 import TagsTable from '@/components/TagsTable.vue'
+import ActivityListDisplay from '@/components/ActivityListDisplay.vue'
 
 export default defineComponent({
   name: 'template-builder-help',
   data () {
     return {
       perActivityTemplateTags: Constants.PER_EVENT_TEMPLATE_TAGS,
-      summaryActivityTemplateTags: Constants.SUMMARY_TEMPLATE_TAGS
+      summaryActivityTemplateTags: Constants.SUMMARY_TEMPLATE_TAGS,
+      activityTypes: Constants.ACTIVITY_TYPES
     }
   },
   components: {
-    TagsTable
+    TagsTable,
+    ActivityListDisplay
   },
   methods: {}
 })
