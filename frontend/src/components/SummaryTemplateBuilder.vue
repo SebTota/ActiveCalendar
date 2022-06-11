@@ -14,6 +14,7 @@
           <h5>Calendar Event Template</h5>
           <textarea ref="templateBuilderInput" class="form-control" aria-label="summary text area" rows="7" v-model="this.descriptionTemplate"></textarea>
         </div>
+        <a href="https://strava.sebtota.com/help/templateBuilder" target="_blank">Need help making a template?</a>
       </div>
     </div>
     <div>
