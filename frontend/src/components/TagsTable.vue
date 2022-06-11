@@ -1,8 +1,7 @@
 <template>
-  <div>
-    <table class="table table-sm">
-      <div style="height: 400px; overflow: scroll">
-        <thead>
+  <div class="table-container">
+    <table class="table">
+      <thead>
         <tr>
           <th scope="col">Tag Name</th>
           <th scope="col">Description</th>
@@ -14,7 +13,6 @@
           <td>{{ k }}</td>
         </tr>
         </tbody>
-      </div>
     </table>
   </div>
 </template>
@@ -35,5 +33,21 @@ export default defineComponent({
 </script>
 
 <style scoped>
+table {
+  width: 100%;
+}
 
+.table-container {
+  max-height: 450px;
+  overflow-y: scroll;
+  border: 1px solid #ddd;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+th, td {
+  padding: 16px;
+}
 </style>
