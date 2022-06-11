@@ -1,6 +1,6 @@
 <template>
 <div class="w-100 h-100">
-    <div id="intro-container" class="container w-100 h-100">
+    <div class="container w-100 h-100">
         <div class="row" style="height: 100%;">
             <div class="col-sm-8 home-page-column home-page-column-left">
               <div>
@@ -60,12 +60,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
-#intro-container {
-    padding-top: 70px;
-    padding-bottom: 30px;
-    height: 100%;
-}
 
 #intro-statement {
     font-size: 20pt;
