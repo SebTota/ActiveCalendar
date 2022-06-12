@@ -25,14 +25,22 @@
       in your calendar events, use activity types to customize your template even more by separating each activities data.</p>
       <ActivityListDisplay :activities="activityTypes" />
     </div>
+        <div class="pb-4">
+          <h2>Summary Examples</h2>
+          <div v-for="example in exampleSummaryTemplates" v-bind:key="example" class="mb-2">
+            <ExampleTemplateCard :template="example[0]" :result="example[1]"/>
+          </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import Constants from '@/constants/constants'
+import ExampleTemplates from '@/constants/exampleTemplates'
 import TagsTable from '@/components/TagsTable.vue'
 import ActivityListDisplay from '@/components/ActivityListDisplay.vue'
+import ExampleTemplateCard from '@/components/ExampleTemplateCard.vue'
 
 export default defineComponent({
   name: 'template-builder-help',
@@ -40,12 +48,14 @@ export default defineComponent({
     return {
       perActivityTemplateTags: Constants.PER_EVENT_TEMPLATE_TAGS,
       summaryActivityTemplateTags: Constants.SUMMARY_TEMPLATE_TAGS,
-      activityTypes: Constants.ACTIVITY_TYPES
+      activityTypes: Constants.ACTIVITY_TYPES,
+      exampleSummaryTemplates: ExampleTemplates.SUMMARY_TEMPLATES
     }
   },
   components: {
     TagsTable,
-    ActivityListDisplay
+    ActivityListDisplay,
+    ExampleTemplateCard
   },
   methods: {}
 })
