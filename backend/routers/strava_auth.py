@@ -8,7 +8,7 @@ import time
 from stravalib.model import Athlete
 
 from strava_calendar_summary_data_access_layer import StravaCredentials, User, UserController
-from strava_calendar_summary_utils import StravaUtil
+from backend.accessors import StravaAccessor
 from backend.models import user_auth, UserUI
 
 router = APIRouter(tags=["Strava Auth"])
@@ -44,7 +44,7 @@ def strava_authorized_callback(code: str):
     expires_at = token_response['expires_at']
 
     strava_credentials: StravaCredentials = StravaCredentials(access_token, refresh_token, expires_at)
-    strava_util = StravaUtil(strava_credentials)
+    strava_util = StravaAccessor(strava_credentials)
     athlete: Athlete = strava_util.get_athlete()
     athlete_id: str = str(athlete.id)
 
@@ -85,7 +85,7 @@ async def get_strava_user_info(response: Response, Authentication: Optional[str]
 
     if auth_cookie.expires < time.time():
         # Refresh Strava access token
-        refreshed_credentials: StravaCredentials = StravaUtil(user.strava_credentials, user).update_strava_credentials()
+        refreshed_credentials: StravaCredentials = StravaAccessor(user.strava_credentials, user).update_strava_credentials()
 
         if refreshed_credentials is None:
             raise HTTPException(status_code=401, detail='Couldn\'t refresh user strava access token')
