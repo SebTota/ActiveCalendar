@@ -2,14 +2,13 @@ from typing import Union
 
 from backend.models import user_auth
 
-from strava_calendar_summary_data_access_layer import User, UserController, StravaCredentials, CalendarPreferences
+from strava_calendar_summary_data_access_layer import User, UserController, CalendarPreferences
 from strava_calendar_summary_utils import template_builder
 
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
 import logging
 from pydantic import BaseModel
-import json
 
 router = APIRouter(prefix='/summary/template')
 

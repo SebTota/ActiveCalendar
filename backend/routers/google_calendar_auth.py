@@ -1,6 +1,6 @@
 from backend.models import user_auth
 from strava_calendar_summary_data_access_layer import User, UserController
-from strava_calendar_summary_utils.google_calendar.google_calendar_util import SCOPES as GOOGLE_CALENDAR_AUTH_SCOPES
+from backend.accessors.google_calendar_accessor import SCOPES as GOOGLE_CALENDAR_AUTH_SCOPES
 
 from typing import Optional
 from fastapi import APIRouter, Request, HTTPException, Cookie
