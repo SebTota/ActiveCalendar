@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Any, Union
+from typing import Any, Union, Optional
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -43,10 +43,9 @@ def create_account_verification_token(email: str) -> str:
     return url_serializer.dumps(email, settings.EMAIL_ACCOUNT_VERIFICATION_SALT)
 
 
-def confirm_account_verification_token(token: str, email: str) -> bool:
+def confirm_account_verification_token(token: str) -> Optional[str]:
     serializer = URLSafeTimedSerializer(settings.EMAIL_ACCOUNT_VERIFICATION_SECRET_KEY)
     try:
-        deserialized_email = serializer.loads(token, salt=settings.EMAIL_ACCOUNT_VERIFICATION_SALT, max_age=3600)
-        return email == deserialized_email
+        return serializer.loads(token, salt=settings.EMAIL_ACCOUNT_VERIFICATION_SALT, max_age=3600)
     except Exception:
-        return False
+        return None
