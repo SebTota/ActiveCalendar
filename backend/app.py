@@ -1,19 +1,24 @@
-from fastapi import FastAPI, APIRouter
-from starlette.middleware.sessions import SessionMiddleware
 import os
 
-from backend.routers import google_calendar_auth, strava_auth, strava_webhook, template_controller
-from strava_calendar_summary_utils import Logging
+from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
+
+from backend.db.session import SessionLocal
+from backend.db.init_db import init_db
+from backend.core.config import settings
+from backend.api.v1.api import api_router
+
+db = SessionLocal()
+init_db(db)
 
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key=os.getenv('COOKIE_SECRET_KEY'))
-app.include_router(google_calendar_auth.router, prefix='/api')
-app.include_router(strava_webhook.router, prefix='/api')
-app.include_router(strava_auth.router, prefix='/api')
-app.include_router(template_controller.router, prefix='/api')
-Logging()
 
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost", "http://localhost:*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-@app.get('/api/ping')
-def root():
-    return 'Success'
+app.include_router(api_router, prefix=settings.API_V1_STR)
