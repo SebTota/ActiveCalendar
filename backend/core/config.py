@@ -25,5 +25,8 @@ class Settings(BaseSettings):
     SMTP_USER: str = os.getenv('SMTP_USERNAME')
     SMTP_PASSWORD: str = os.getenv('SMTP_PASSWORD')
 
+    STRAVA_CLIENT_ID: str = os.getenv('STRAVA_CLIENT_ID')
+    STRAVA_CLIENT_SECRET: str = os.getenv('STRAVA_CLIENT_SECRET')
+
 
 settings = Settings()
