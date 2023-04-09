@@ -14,6 +14,9 @@ router = APIRouter()
 
 @router.post("/", response_model=schemas.User)
 def create_user(new_user: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
+    """
+    Create a new user
+    """
     user: Optional[models.User] = crud.user.get_by_email(db, new_user.email)
     if user:
         raise HTTPException(
@@ -30,6 +33,9 @@ def create_user(new_user: schemas.UserCreate, db: Session = Depends(deps.get_db)
 
 @router.post("/verify", response_model=schemas.Msg)
 def verify_user(token: str, db: Session = Depends(deps.get_db)) -> Any:
+    """
+    Verify a users account
+    """
     email: Optional[str] = confirm_account_verification_token(token)
     user: Optional[models.User] = None
 
@@ -53,3 +59,10 @@ def verify_user(token: str, db: Session = Depends(deps.get_db)) -> Any:
         "msg": "Account verified."
     }
 
+
+@router.get("/me", response_model=schemas.User)
+def get_user_me(db: Session = Depends(deps.get_db), current_user: models.User = Depends(deps.get_current_active_user)):
+    """
+    Get current signed-in user
+    """
+    return current_user

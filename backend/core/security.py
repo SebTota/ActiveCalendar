@@ -1,10 +1,14 @@
+import json
+import secrets
 from datetime import datetime, timedelta
 from typing import Any, Union, Optional
 
 from jose import jwt
 from passlib.context import CryptContext
 from itsdangerous import URLSafeTimedSerializer
+from sqlalchemy.orm import Session
 
+from backend import schemas, models
 from backend.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -13,18 +17,14 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
 
 
-def create_access_token(
-    subject: Union[str, Any], expires_delta: timedelta = None
-) -> str:
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        )
-    to_encode = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+def create_auth_token(user: models.User) -> schemas.Token:
+    access_token_expires: datetime = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode: schemas.TokenPayload = schemas.TokenPayload(exp=access_token_expires, sub=str(user.id))
+    encoded_jwt = jwt.encode(to_encode.dict(), settings.SECRET_KEY, algorithm=ALGORITHM)
+
+    return schemas.Token(token_type='bearer',
+                         access_token=encoded_jwt,
+                         access_token_expires=access_token_expires)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:

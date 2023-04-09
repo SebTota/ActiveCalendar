@@ -49,6 +49,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             return None
         return user
 
+    def is_pending_email_verification(self, user: User) -> bool:
+        return user.status == UserStatus.PENDING_EMAIL_VERIFICATION
+
     def is_active(self, user: User) -> bool:
         return user.status == UserStatus.ACTIVE
 
