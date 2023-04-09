@@ -3,7 +3,7 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = 'Active Calendar'
+    PROJECT_NAME: str = os.getenv('PROJECT_NAME')
     API_V1_STR: str = '/api/v1'
     API_HOST: str = f'http://localhost:9005{API_V1_STR}'
     SECRET_KEY: str = os.getenv('API_CREDENTIALS_GENERATOR_SECRET_KEY')
@@ -11,18 +11,21 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = (60 * 24 * 14)
     REFRESH_TOKEN_EXPIRE_MINUTES: int = (60 * 24 * 90)
 
-    DATABASE_PASSWORD: str = os.getenv('DATABASE_PASSWORD')
-    DATABASE_URL: str = f'postgresql://postgres:{DATABASE_PASSWORD}@database-1.cxabyrsbraij.eu-central-1.rds.amazonaws.com/active_calendar'
+    DATABASE_USER: str = os.getenv('POSTGRES_USER')
+    DATABASE_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
+    DATABASE_SERVER: str = os.getenv('POSTGRES_SERVER')
+    DATABASE_DB: str = os.getenv('POSTGRES_DB')
+    DATABASE_URL: str = f'postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_SERVER}/{DATABASE_DB}'
 
     EMAIL_ACCOUNT_VERIFICATION_SECRET_KEY: str = os.getenv('ACCOUNT_VERIFICATION_SECRET_KEY')
     EMAIL_ACCOUNT_VERIFICATION_SALT: str = os.getenv('ACCOUNT_VERIFICATION_SALT')
     EMAIL_TEMPLATES_DIR: str = './backend/email_templates'
-    EMAILS_FROM_NAME: str = 'Active Calendar'
-    EMAILS_FROM_EMAIL: str = 'account_services@active.sebtota.com'
+    EMAILS_FROM_NAME: str = PROJECT_NAME
+    EMAILS_FROM_EMAIL: str = os.getenv('EMAILS_FROM_EMAIL')
 
-    SMTP_HOST: str = os.getenv('SMTP_SERVER')
-    SMTP_PORT: int = 587
-    SMTP_USER: str = os.getenv('SMTP_USERNAME')
+    SMTP_HOST: str = os.getenv('SMTP_HOST')
+    SMTP_PORT: int = os.getenv('SMTP_PORT')
+    SMTP_USER: str = os.getenv('SMTP_USER')
     SMTP_PASSWORD: str = os.getenv('SMTP_PASSWORD')
 
     STRAVA_CLIENT_ID: str = os.getenv('STRAVA_CLIENT_ID')
