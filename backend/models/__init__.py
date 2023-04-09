@@ -1,5 +1,3 @@
 from .session_data import SessionData
-from .user_ui import UserUI
-from .user_auth import UserAuth
-from . import user_auth
+from .strava_auth import StravaAuth
 from .user import User, UserStatus
