@@ -1,8 +1,10 @@
 from fastapi import APIRouter
 
-from backend.api.v1.endpoints import login, users, strava
+from backend.api.v1.endpoints import login, users, strava, strava_webhook
 
 api_router = APIRouter()
-api_router.include_router(login.router, prefix="/login", tags=["login"])
+api_router.include_router(login.router, prefix="/login", tags=["login", "auth"])
 api_router.include_router(users.router, prefix="/users", tags=["users"])
-api_router.include_router(strava.router, prefix='/strava', tags=["strava"])
+api_router.include_router(strava.router, prefix='/strava', tags=["strava", "auth"])
+api_router.include_router(strava_webhook.router, prefix='/strava_activity',
+                          tags=["strava", "strava activity", "strava webhook"])

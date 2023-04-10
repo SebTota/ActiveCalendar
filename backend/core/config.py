@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     SMTP_USER: str = os.getenv('SMTP_USER')
     SMTP_PASSWORD: str = os.getenv('SMTP_PASSWORD')
 
+    STRAVA_WEBHOOK_VERIFICATION_TOKEN: str = os.getenv('STRAVA_WEBHOOK_VERIFICATION_TOKEN')
+    STRAVA_SUBSCRIPTION_ID: str = os.getenv('STRAVA_SUBSCRIPTION_ID')
     STRAVA_CLIENT_ID: str = os.getenv('STRAVA_CLIENT_ID')
     STRAVA_CLIENT_SECRET: str = os.getenv('STRAVA_CLIENT_SECRET')
 
