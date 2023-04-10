@@ -1,4 +1,3 @@
-from datetime import timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,7 +7,6 @@ from sqlalchemy.orm import Session
 from backend import schemas, crud, models
 from backend.api import deps
 from backend.core import security
-from backend.core.config import settings
 
 router = APIRouter()
 
@@ -30,8 +28,8 @@ def login_access_token(db: Session = Depends(deps.get_db), form_data: OAuth2Pass
     return security.create_auth_token(user)
 
 
-@router.post("/test-token", response_model=schemas.User)
-def test_token(current_user: models.User = Depends(deps.get_current_user)) -> Any:
+@router.get("/me", response_model=schemas.User)
+def get_me(current_user: models.User = Depends(deps.get_current_user)) -> Any:
     """
     Test access token
     """
