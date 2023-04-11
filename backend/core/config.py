@@ -5,7 +5,10 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     PROJECT_NAME: str = os.getenv('PROJECT_NAME')
     API_V1_STR: str = '/api/v1'
-    API_HOST: str = f'http://localhost:9005{API_V1_STR}'
+    API_HOST: str = f'http://localhost{API_V1_STR}'
+    GOOGLE_AUTH_CALLBACK_URL: str = f'{API_HOST}/google_auth/callback'
+    STRAVA_AUTH_CALLBACK_URL: str = f'{API_HOST}/strava_auth/callback'
+
     SECRET_KEY: str = os.getenv('API_CREDENTIALS_GENERATOR_SECRET_KEY')
     REFRESH_TOKEN_SECRET_KEY: str = os.getenv('API_CREDENTIALS_REFRESH_TOKEN_SECRET_KEY')
     ACCESS_TOKEN_EXPIRE_MINUTES: int = (60 * 24 * 14)

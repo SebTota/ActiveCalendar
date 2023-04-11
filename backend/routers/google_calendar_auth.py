@@ -10,7 +10,7 @@ import google_auth_oauthlib.flow
 
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-GOOGLE_CONFIG_PATH = os.path.join(ROOT_DIR, '../../client_secret.json')
+GOOGLE_CONFIG_PATH = os.path.join(ROOT_DIR, '../client_secret.json')
 
 router = APIRouter()
 

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import logging
 
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from stravalib.client import Client
@@ -14,12 +14,10 @@ router = APIRouter()
 
 
 @router.get('/auth')
-def strava_auth(request: Request,
-                db: Session = Depends(deps.get_db),
-                current_user: models.User = Depends(deps.get_current_active_user)):
+def strava_auth(current_user: models.User = Depends(deps.get_current_active_user)):
     auth_url = Client().authorization_url(
             client_id=int(settings.STRAVA_CLIENT_ID),
-            redirect_uri=request.url_for('strava_auth_callback'),
+            redirect_uri=settings.STRAVA_AUTH_CALLBACK_URL,
             scope=['read', 'activity:read_all'])
 
     return RedirectResponse(auth_url + '&approval_prompt=auto')

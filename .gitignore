@@ -1,7 +1,7 @@
 env
 *__pycache__*
 .DS_Store
-client_secret.json
+backend/client_secret.json
 secrets.sh
 google_creds.json
 cert.pem
