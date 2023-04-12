@@ -9,10 +9,10 @@ if TYPE_CHECKING:
     from .user import User  # noqa: F401
 
 
-class StravaAuth(Base):
+class StravaCredentials(Base):
     id = Column(String(12), primary_key=True, index=True)
     access_token = Column(String, nullable=False)
     expires_at = Column(DateTime, nullable=False)
     refresh_token = Column(String, nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    user: Mapped["User"] = relationship(back_populates="strava_auth")
+    user: Mapped["User"] = relationship(back_populates="strava_credentials")

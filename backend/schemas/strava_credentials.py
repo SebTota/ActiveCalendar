@@ -5,22 +5,22 @@ from pydantic import BaseModel
 
 
 # Shared properties
-class StravaAuthBase(BaseModel):
+class StravaCredentialsBase(BaseModel):
     access_token: str
     expires_at: datetime.datetime
     refresh_token: str
 
 
 # Properties to receive via API on creation
-class StravaAuthCreate(StravaAuthBase):
+class StravaCredentialsCreate(StravaCredentialsBase):
     pass
 
 
-class StravaAuthUpdate(StravaAuthCreate):
+class StravaCredentialsUpdate(StravaCredentialsCreate):
     pass
 
 
-class StravaAuthInDBBase(StravaAuthBase):
+class StravaCredentialsInDBBase(StravaCredentialsBase):
     id: Optional[str] = None
 
     class Config:
@@ -28,10 +28,10 @@ class StravaAuthInDBBase(StravaAuthBase):
 
 
 # Additional properties to return via API
-class StravaAuth(StravaAuthInDBBase):
+class StravaCredentials(StravaCredentialsInDBBase):
     pass
 
 
 # Additional properties stored in DB
-class StravaAuthInDB(StravaAuthInDBBase):
+class StravaCredentialsInDB(StravaCredentialsInDBBase):
     pass

@@ -1,7 +1,6 @@
 from typing import Any, Dict, Optional, Union
 
 from sqlalchemy.orm import Session
-import shortuuid
 
 from backend.core.security import get_password_hash, verify_password
 from backend.crud.base import CRUDBase

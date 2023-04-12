@@ -1,12 +1,9 @@
-import json
-import secrets
 from datetime import datetime, timedelta
-from typing import Any, Union, Optional
+from typing import Optional
 
 from jose import jwt
 from passlib.context import CryptContext
 from itsdangerous import URLSafeTimedSerializer
-from sqlalchemy.orm import Session
 
 from backend import schemas, models
 from backend.core.config import settings

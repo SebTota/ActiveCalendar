@@ -42,10 +42,10 @@ def strava_auth_callback(code: str,
     refresh_token: str = token_response['refresh_token']
     expires_at: datetime = datetime.fromtimestamp(token_response['expires_at'], timezone.utc)
 
-    strava_auth_obj: schemas.StravaAuthCreate = schemas.StravaAuthCreate(access_token=access_token,
-                                                                         expires_at=expires_at,
-                                                                         refresh_token=refresh_token)
+    strava_credentials_obj: schemas.StravaCredentialsCreate = schemas.StravaCredentialsCreate(access_token=access_token,
+                                                                                       expires_at=expires_at,
+                                                                                       refresh_token=refresh_token)
 
-    crud.strava_auth.create_and_add_to_user(db, current_user.id, strava_auth_obj)
+    crud.strava_credentials.create_and_add_to_user(db, current_user.id, strava_credentials_obj)
 
     return schemas.Msg(msg="Authenticated.")
