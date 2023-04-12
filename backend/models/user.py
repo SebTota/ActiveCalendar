@@ -8,6 +8,7 @@ from backend.db.base_class import Base
 
 if TYPE_CHECKING:
     from .strava_auth import StravaAuth  # noqa: F401
+    from .google_auth import GoogleAuth  # noqa: F401
 
 
 class UserStatus(str, enum.Enum):
@@ -25,3 +26,4 @@ class User(Base):
     status = Column(Enum(UserStatus), nullable=False)
     is_superuser = Column(Boolean(), default=False, nullable=False)
     strava_auth = relationship("StravaAuth", back_populates="user", cascade="all, delete-orphan")
+    google_auth = relationship("GoogleAuth", back_populates="user", cascade="all, delete-orphan")
