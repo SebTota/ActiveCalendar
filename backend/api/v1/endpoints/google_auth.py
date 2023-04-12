@@ -1,4 +1,3 @@
-import logging
 import os
 
 import google_auth_oauthlib.flow
@@ -9,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from backend import models, schemas, crud
 from backend.api import deps
+from backend.core import logger
 from backend.core.config import settings
 from backend.accessors.google_calendar_accessor import SCOPES as GOOGLE_CALENDAR_AUTH_SCOPES
 
@@ -52,7 +52,7 @@ def google_auth_callback(request: Request,
         authorization_response = 'https://' + str(request.url).replace('http://', '').replace('https://', '')
         flow.fetch_token(authorization_response=authorization_response)
     except Exception as e:
-        logging.error(f"Failed to authenticate user during Google auth request callback. {e}")
+        logger.error(f"Failed to authenticate user during Google auth request callback. {e}")
         raise HTTPException(status_code=403, detail="Failed to authenticate user during Google auth request callback.")
 
     google_credentials = flow.credentials
