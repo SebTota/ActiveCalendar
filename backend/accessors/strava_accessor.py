@@ -46,7 +46,7 @@ class StravaAccessor:
 
         update_strava_credentials: schemas.StravaCredentialsUpdate = schemas.StravaCredentialsUpdate(
             access_token=refresh_response['access_token'],
-            refresh_token=refresh_response['access_token'],
+            refresh_token=refresh_response['refresh_token'],
             expires_at=datetime.fromtimestamp(refresh_response['expires_at'], timezone.utc)
         )
 
