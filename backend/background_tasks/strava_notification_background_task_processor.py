@@ -1,7 +1,5 @@
 from typing import Optional
 
-from requests import Session
-
 from backend import schemas, crud
 from backend.accessors import StravaAccessor
 from backend.core import logger
@@ -12,7 +10,7 @@ from backend.models import StravaCredentials
 class StravaNotificationBackgroundTaskProcessor:
 
     def __init__(self):
-        self._db: Session = SessionLocal()
+        self._db: SessionLocal = SessionLocal()
 
     def process(self, notification: schemas.StravaNotification):
         strava_credentials: Optional[StravaCredentials] = crud.strava_credentials.get(self._db, notification.owner_id)
@@ -21,7 +19,7 @@ class StravaNotificationBackgroundTaskProcessor:
                          f"activity: {notification.object_id} because the user has not authed with Strava")
             return
 
-        strava_accessor: StravaAccessor = StravaAccessor(strava_credentials)
+        strava_accessor: StravaAccessor = StravaAccessor(self._db, strava_credentials)
         logger.info(f"Strava activity: {strava_accessor.get_activity(notification.object_id)}")
 
 

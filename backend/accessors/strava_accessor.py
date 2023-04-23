@@ -12,7 +12,8 @@ from backend.models import StravaCredentials
 
 
 class StravaAccessor:
-    def __init__(self, strava_credentials: StravaCredentials):
+    def __init__(self, db: SessionLocal, strava_credentials: StravaCredentials):
+        self._db: SessionLocal = db
         self._strava_credentials: StravaCredentials = strava_credentials
         self._init_strava_client()
 
@@ -49,10 +50,9 @@ class StravaAccessor:
             expires_at=datetime.fromtimestamp(refresh_response['expires_at'], timezone.utc)
         )
 
-        with SessionLocal() as db:
-            self._strava_credentials = crud.strava_credentials.update(db=db,
-                                                                      db_obj=self._strava_credentials,
-                                                                      obj_in=update_strava_credentials)
+        self._strava_credentials = crud.strava_credentials.update(db=self._db,
+                                                                  db_obj=self._strava_credentials,
+                                                                  obj_in=update_strava_credentials)
 
         logger.info(f"Updated strava user: {self._strava_credentials.user} expired credentials.")
 
