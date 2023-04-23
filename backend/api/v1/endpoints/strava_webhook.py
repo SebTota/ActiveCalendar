@@ -1,12 +1,14 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
 
 from backend import schemas
 from backend.core import logger
 from backend.core.config import settings
+from backend.processors.strava_notification_processor import StravaNotificationProcessor
 
 router = APIRouter()
+strava_notification_processor: StravaNotificationProcessor = StravaNotificationProcessor()
 
 
 @router.get('/webhook')
@@ -30,12 +32,13 @@ def subscribe_webhook(request: Request):
 
 
 @router.post('/webhook', status_code=201)
-async def get_activity_webhook(request: Request):
+async def get_activity_webhook(request: Request, background_tasks: BackgroundTasks):
     body = await request.json()
 
     if 'subscription_id' not in body or 'object_type' not in body or 'aspect_type' not in body \
             or 'owner_id' not in body or 'object_id' not in body or 'event_time' not in body:
-        logger.error('Error processing new event from webhook due to missing parameters in the request body.')
+        logger.error(f'Error processing new event from webhook due to missing parameters in the request body.\n'
+                     f'\tRequest{request}')
         raise HTTPException(status_code=400, detail='Missing required request parameters')
 
     subscription_id = body['subscription_id']
@@ -55,3 +58,4 @@ async def get_activity_webhook(request: Request):
     )
 
     logger.info('Received a new strava activity: {}'.format(strava_notification.dict()))
+    background_tasks.add_task(strava_notification_processor.process, strava_notification)

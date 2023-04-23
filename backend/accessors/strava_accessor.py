@@ -1,48 +1,60 @@
-from strava_calendar_summary_data_access_layer import StravaCredentials, User, UserController
+from datetime import datetime, timezone
+
+from requests import Session
 from stravalib.client import Client
 from stravalib.model import Athlete, Activity
 
-from typing import List
-import time
-import os
+from backend import schemas, crud
+from backend.core import logger
+from backend.core.config import settings
+from backend.db.session import SessionLocal
+from backend.models import StravaCredentials
 
 
 class StravaAccessor:
-    def __init__(self, strava_credentials: StravaCredentials, user: User = None):
-        """Init StravaAccessor
-        strava_credentials: The Strava Credentials object used to authenticate all API calls
-        user: The User object of the requesting user. If present, will update refresh token in db if needed
-        """
+    def __init__(self, strava_credentials: StravaCredentials):
         self._strava_credentials: StravaCredentials = strava_credentials
-        self._user: User = user
         self._init_strava_client()
-        
+
     def _init_strava_client(self):
         self._client = Client()
         self._client.access_token = self._strava_credentials.access_token
         self._client.refresh_token = self._strava_credentials.refresh_token
-        self._client.token_expires_at = self._strava_credentials.expiry_date
+        self._client.token_expires_at = self._strava_credentials.expires_at
 
     def _before_api_call(self) -> None:
         self._update_access_token_if_necessary()
 
     def _update_access_token_if_necessary(self) -> None:
-        if time.time() > self._client.token_expires_at:
-            self.update_strava_credentials()
+        """
+        Checks if we need to update the users Strava access token.
+        """
+        if datetime.now() > self._strava_credentials.expires_at:
+            logger.debug(f"Current time: {datetime.now()}, creds expire at: {self._strava_credentials.expires_at}"
+                         f" so refreshing token...")
+            self._update_access_token()
 
-    def update_strava_credentials(self) -> StravaCredentials:
+    def _update_access_token(self):
+        """
+        Updates the users Strava access token using the refresh token, and updates the db with the new credentials.
+        """
         refresh_response = self._client.refresh_access_token(
-            client_id=int(os.getenv('STRAVA_CLIENT_ID')),
-            client_secret=os.getenv('STRAVA_CLIENT_SECRET'),
-            refresh_token=self._client.refresh_token)
+            client_id=int(settings.STRAVA_CLIENT_ID),
+            client_secret=settings.STRAVA_CLIENT_SECRET,
+            refresh_token=self._strava_credentials.refresh_token)
 
-        self._strava_credentials.access_token = refresh_response['access_token']
-        self._strava_credentials.refresh_token = refresh_response['refresh_token']
-        self._strava_credentials.expiry_date = refresh_response['expires_at']
+        update_strava_credentials: schemas.StravaCredentialsUpdate = schemas.StravaCredentialsUpdate(
+            access_token=refresh_response['access_token'],
+            refresh_token=refresh_response['access_token'],
+            expires_at=datetime.fromtimestamp(refresh_response['expires_at'], timezone.utc)
+        )
 
-        if self._user is not None:
-            self._user.strava_credentials = self._strava_credentials
-            UserController().update(self._user.user_id, self._user)
+        with SessionLocal() as db:
+            self._strava_credentials = crud.strava_credentials.update(db=db,
+                                                                      db_obj=self._strava_credentials,
+                                                                      obj_in=update_strava_credentials)
+
+        logger.info(f"Updated strava user: {self._strava_credentials.user} expired credentials.")
 
         return self._strava_credentials
 
