@@ -27,3 +27,4 @@ class User(Base):
     is_superuser = Column(Boolean(), default=False, nullable=False)
     strava_credentials = relationship("StravaCredentials", back_populates="user", cascade="all, delete-orphan")
     google_auth = relationship("GoogleAuth", back_populates="user", cascade="all, delete-orphan")
+    calendar_templates = relationship("CalendarTemplate", back_populates="user", cascade="all, delete-orphan")
