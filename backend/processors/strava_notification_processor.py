@@ -6,7 +6,7 @@ from backend import schemas, crud
 from backend.accessors import StravaAccessor
 from backend.core import logger
 from backend.db.session import SessionLocal
-from backend.models import User, StravaCredentials
+from backend.models import StravaCredentials
 
 
 class StravaNotificationProcessor:
