@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, String, DateTime, ForeignKey
+from sqlalchemy import Column, String, DateTime, ForeignKey, Integer
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from backend.db.base_class import Base
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class StravaCredentials(Base):
-    id = Column(String(12), primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)  # Also the athlete's Strava id
     access_token = Column(String, nullable=False)
     expires_at = Column(DateTime, nullable=False)
     refresh_token = Column(String, nullable=False)

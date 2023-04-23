@@ -42,10 +42,18 @@ def strava_auth_callback(code: str,
     refresh_token: str = token_response['refresh_token']
     expires_at: datetime = datetime.fromtimestamp(token_response['expires_at'], timezone.utc)
 
-    strava_credentials_obj: schemas.StravaCredentialsCreate = schemas.StravaCredentialsCreate(access_token=access_token,
-                                                                                       expires_at=expires_at,
-                                                                                       refresh_token=refresh_token)
+    client: Client = Client(access_token=access_token)
+    athlete_id: int = int(client.get_athlete().id)
 
-    crud.strava_credentials.create_and_add_to_user(db, current_user.id, strava_credentials_obj)
+    if athlete_id is None or athlete_id < 0:
+        logging.error(f'Could not find the athlete details: {athlete_id} during Strava authentication.')
+        raise HTTPException(status_code=500,
+                            detail='Failed to retrieve athlete details during authentication.')
+
+    strava_credentials: schemas.StravaCredentialsCreate = schemas.StravaCredentialsCreate(access_token=access_token,
+                                                                                          expires_at=expires_at,
+                                                                                          refresh_token=refresh_token)
+
+    crud.strava_credentials.create_and_add_to_user(db, current_user.id, athlete_id, strava_credentials)
 
     return schemas.Msg(msg="Authenticated.")
