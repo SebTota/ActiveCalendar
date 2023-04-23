@@ -9,7 +9,7 @@ from backend.db.session import SessionLocal
 from backend.models import StravaCredentials
 
 
-class StravaNotificationProcessor:
+class StravaNotificationBackgroundTaskProcessor:
 
     def __init__(self):
         self._db: Session = SessionLocal()
@@ -25,4 +25,5 @@ class StravaNotificationProcessor:
         logger.info(f"Strava activity: {strava_accessor.get_activity(notification.object_id)}")
 
 
-strava_notification_processor: StravaNotificationProcessor = StravaNotificationProcessor()
+strava_notification_background_task_processor: StravaNotificationBackgroundTaskProcessor = \
+    StravaNotificationBackgroundTaskProcessor()

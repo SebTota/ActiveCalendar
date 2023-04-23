@@ -5,10 +5,11 @@ from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
 from backend import schemas
 from backend.core import logger
 from backend.core.config import settings
-from backend.processors.strava_notification_processor import StravaNotificationProcessor
+from backend.background_tasks.strava_notification_background_task_processor import \
+    StravaNotificationBackgroundTaskProcessor
 
 router = APIRouter()
-strava_notification_processor: StravaNotificationProcessor = StravaNotificationProcessor()
+strava_notification_processor: StravaNotificationBackgroundTaskProcessor = StravaNotificationBackgroundTaskProcessor()
 
 
 @router.get('/webhook')

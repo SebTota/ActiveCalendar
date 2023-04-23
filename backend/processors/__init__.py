@@ -1,1 +1,0 @@
-from .strava_notification_processor import strava_notification_processor
