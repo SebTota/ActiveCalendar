@@ -3,7 +3,7 @@ from typing import Optional
 from stravalib.model import Activity
 
 from backend import schemas, crud, models
-from backend.accessors import StravaAccessor
+from backend.accessors import StravaAccessor, GoogleCalendarAccessor
 from backend.core import logger
 from backend.db.session import SessionLocal
 from backend.models import StravaCredentials
@@ -44,6 +44,14 @@ class StravaNotificationBackgroundTaskProcessor:
             print('Other Summary')
             print(f'Title template: {gen_title_template}')
             print(f'Body template: {gen_body_template}')
+
+        google_auth: Optional[models.GoogleAuth] = crud.google_auth.get_for_user(self._db, strava_credentials.user_id)
+        if not google_auth:
+            logger.error(f"Could not process Strava event: {notification.object_id} "
+                         f"for user: {strava_credentials.user_id} due to missing Google Auth.")
+            return
+
+        cal_accessor: GoogleCalendarAccessor = GoogleCalendarAccessor(db=self._db, google_auth=google_auth)
 
 
 strava_notification_background_task_processor: StravaNotificationBackgroundTaskProcessor = \

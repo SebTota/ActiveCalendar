@@ -1,11 +1,16 @@
+from datetime import datetime, timedelta
 from typing import Union
 
+from sqlalchemy.orm import Session
 from strava_calendar_summary_data_access_layer import User, UserController
 
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
-import logging
+from backend.core import logger
+
+from backend import schemas, crud
+from backend.models import GoogleAuth
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.app.created',
           'https://www.googleapis.com/auth/calendar.calendarlist.readonly']
@@ -13,38 +18,45 @@ CALENDAR_NAME = 'Strava Summary'
 
 
 class GoogleCalendarAccessor:
-    def __init__(self, calendar_credentials: Credentials, calendar_id: str = None, user: User = None):
-        """Init GoogleCalendarAccessor for Google Calendar API Calls
-        calendar_credentials: the credentials to authenticate each API call with
-        calendar_id: the id of the calendar created for this application IF one exists
-        user: the User object of the requesting user. If present, updates calendar_credentials on refresh of credentials
+    def __init__(self, db: Session, google_auth: GoogleAuth) -> None:
         """
-        self._calendar_auth = calendar_credentials
-        self._calendar_id = calendar_id
-        self._user = user
+        Init GoogleCalendarAccessor for Google Calendar API Calls
+        """
+        self._db = db
+        self._google_auth = google_auth
 
         self._refresh_creds_if_needed()
-        self._service: build = build('calendar', 'v3', credentials=self._calendar_auth)
+        self._service: build = build('calendar', 'v3', credentials=self._get_credentials())
 
+        self._calendar_id = self._get_app_calendar_id(CALENDAR_NAME)
         if self._calendar_id is None:
-            self._calendar_id = self._get_app_calendar_id(CALENDAR_NAME)
-            if self._calendar_id is None:
-                self._calendar_id = self._create_app_calendar(CALENDAR_NAME)
-            self._save_app_calendar_id(self._calendar_id)
+            self._calendar_id = self._create_app_calendar(CALENDAR_NAME)
 
-    def get_calendar_id(self) -> Union[str, None]:
-        """
-        Retrieve the application's calendar id
-        :return: the calendar id or None if one doesn't yet exist
-        """
-        return self._calendar_id
+    def _get_credentials(self) -> Credentials:
+        return Credentials(token=self._google_auth.token,
+                           token_uri=self._google_auth.token_uri,
+                           client_id=self._google_auth.client_id,
+                           expiry=self._google_auth.expiry,
+                           client_secret=self._google_auth.client_secret,
+                           refresh_token=self._google_auth.refresh_token,
+                           scopes=self._google_auth.scopes)
 
     def _before_each_request(self):
         self._refresh_creds_if_needed()
 
     def _refresh_creds_if_needed(self):
-        if self._calendar_auth and self._calendar_auth.refresh_token:
-            self._calendar_auth.refresh(Request())
+        creds: Credentials = self._get_credentials()
+        if creds and creds.expiry < datetime.utcnow() + timedelta(minutes=15):
+            logger.info(f"Refreshing Google credentials for user: {self._google_auth.user_id}.")
+            creds.refresh(Request())
+            changes: schemas.GoogleAuthUpdate = schemas.GoogleAuthUpdate(token=creds.token,
+                                                                         token_uri=creds.token_uri,
+                                                                         client_id=creds.client_id,
+                                                                         client_secret=creds.client_secret,
+                                                                         expiry=creds.expiry,
+                                                                         refresh_token=creds.refresh_token,
+                                                                         scopes=creds.scopes)
+            self._google_auth = crud.google_auth.update(db=self._db, db_obj=self._google_auth, obj_in=changes)
 
     def _get_app_calendar_id(self, calendar_name) -> Union[str, None]:
         """
@@ -79,17 +91,6 @@ class GoogleCalendarAccessor:
 
         created_calendar_id = self._service.calendars().insert(body=calendar).execute()['id']
         return created_calendar_id
-
-    def _save_app_calendar_id(self, calendar_id: str):
-        """
-        Save the calendar id to the signed in user
-        :param calendar_id: the id of the calendar
-        :return: none
-        """
-        if self._user is not None and self._user.calendar_id != calendar_id:
-            self._user.calendar_id = calendar_id
-            UserController().update(self._user.user_id, self._user)
-            logging.info('Saved app calendar: {} for user: {}'.format(calendar_id, self._user.user_id))
 
     def add_all_day_event(self, name: str, description: str, timezone: str, date: str) -> str:
         """
