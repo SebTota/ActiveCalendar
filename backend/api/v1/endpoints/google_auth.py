@@ -40,6 +40,8 @@ def google_auth_callback(request: Request,
                          state: str,
                          db: Session = Depends(deps.get_db),
                          current_user: models.User = Depends(deps.get_current_active_user)):
+    # TODO: Delete existing google_auth from db if user authenticated with Google before
+
     try:
         flow: google_auth_oauthlib.flow.Flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
             GOOGLE_CONFIG_PATH,
@@ -58,6 +60,7 @@ def google_auth_callback(request: Request,
     google_credentials = flow.credentials
 
     google_auth: schemas.GoogleAuthCreate = schemas.GoogleAuthCreate(
+        token=google_credentials.token,
         client_id=google_credentials.client_id,
         client_secret=google_credentials.client_secret,
         expiry=google_credentials.expiry,
