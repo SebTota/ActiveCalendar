@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 class GoogleAuth(Base):
     id = Column(String(12), primary_key=True, index=True)
     token = Column(String, nullable=False)
+    token_uri = Column(String, nullable=False)
     client_id = Column(String, nullable=False)
     client_secret = Column(String, nullable=False)
     expiry = Column(DateTime, nullable=False)

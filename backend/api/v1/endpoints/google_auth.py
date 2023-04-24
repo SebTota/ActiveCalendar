@@ -61,6 +61,7 @@ def google_auth_callback(request: Request,
 
     google_auth: schemas.GoogleAuthCreate = schemas.GoogleAuthCreate(
         token=google_credentials.token,
+        token_uri=google_credentials.token_uri,
         client_id=google_credentials.client_id,
         client_secret=google_credentials.client_secret,
         expiry=google_credentials.expiry,

@@ -16,6 +16,7 @@ class CRUDGoogleAuth(CRUDBase[GoogleAuth, GoogleAuthCreate, GoogleAuthUpdate]):
     def create_and_add_to_user(self, db: Session, user_id: str, google_auth_obj: GoogleAuthCreate):
         google_auth_db_obj: GoogleAuth = GoogleAuth(id = get_random_alphanumeric_string(12),
                                                     token=google_auth_obj.token,
+                                                    token_uri=google_auth_obj.token_uri,
                                                     client_id = google_auth_obj.client_id,
                                                     client_secret = google_auth_obj.client_secret,
                                                     expiry = google_auth_obj.expiry,
