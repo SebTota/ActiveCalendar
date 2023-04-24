@@ -1,10 +1,14 @@
 from typing import Optional
 
-from backend import schemas, crud
+from stravalib.model import Activity
+
+from backend import schemas, crud, models
 from backend.accessors import StravaAccessor
 from backend.core import logger
 from backend.db.session import SessionLocal
 from backend.models import StravaCredentials
+from backend.schemas import CalendarTemplateType
+from backend.utils import calendar_template_utils
 
 
 class StravaNotificationBackgroundTaskProcessor:
@@ -20,7 +24,26 @@ class StravaNotificationBackgroundTaskProcessor:
             return
 
         strava_accessor: StravaAccessor = StravaAccessor(self._db, strava_credentials)
-        logger.info(f"Strava activity: {strava_accessor.get_activity(notification.object_id)}")
+        activity: Activity = strava_accessor.get_activity(notification.object_id)
+        templates: dict = crud.calendar_template.get_all_active_templates(self._db, strava_credentials.user_id)
+
+        if CalendarTemplateType.ACTIVITY_SUMMARY in templates.keys():
+            # Generate activity summary for single activity
+            template: models.CalendarTemplate = templates.pop(CalendarTemplateType.ACTIVITY_SUMMARY)
+            gen_title_template: str = calendar_template_utils.fill_template(template.title_template, activity)
+            gen_body_template: str = calendar_template_utils.fill_template(template.body_template, activity)
+            print('Activity Summary')
+            print(f'Title template: {gen_title_template}')
+            print(f'Body template: {gen_body_template}')
+
+        for template_type, template in templates.items():
+            # If there was a regular activity_summary template type, it won't be in this list. This will
+            # only contain summary templates.
+            gen_title_template: str = calendar_template_utils.fill_template(template.title_template, activity)
+            gen_body_template: str = calendar_template_utils.fill_template(template.body_template, activity)
+            print('Other Summary')
+            print(f'Title template: {gen_title_template}')
+            print(f'Body template: {gen_body_template}')
 
 
 strava_notification_background_task_processor: StravaNotificationBackgroundTaskProcessor = \
