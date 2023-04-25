@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from typing import Union
 
 from sqlalchemy.orm import Session
-from strava_calendar_summary_data_access_layer import User, UserController
 
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
@@ -115,14 +114,9 @@ class GoogleCalendarAccessor:
         """
         return self.update_event(event_id, name, description, timezone, date, date)
 
-    def add_event(self, name: str, description: str, timezone: str, start: str, end: str) -> str:
+    def add_event(self, name: str, description: str, timezone: str, start_date: datetime, end_date: datetime, is_all_day_event: bool) -> str:
         """
         Add a new calendar event
-        :param name: name of the calendar event
-        :param description: description of the calendar event
-        :param timezone: timezone of where the event happened
-        :param start: start datetime of the event
-        :param end: end datetime of the event
         :return: the id of the calendar event or '-1' on error
         """
         self._before_each_request()
@@ -137,14 +131,12 @@ class GoogleCalendarAccessor:
             }
         }
 
-        if len(start) == 10 and len(end) == 10:
-            event_body['start']['date'] = start
-            event_body['end']['date'] = end
-        elif len(start) == 19 and len(end) == 19:
-            event_body['start']['dateTime'] = start
-            event_body['end']['dateTime'] = end
+        if is_all_day_event:
+            event_body['start']['date'] = start_date.strftime('%Y-%m-%d')
+            event_body['end']['date'] = end_date.strftime('%Y-%m-%d')
         else:
-            return '-1'
+            event_body['start']['dateTime'] = start_date.strftime('%Y-%m-%dT%H:%M:%S')
+            event_body['end']['dateTime'] = end_date.strftime('%Y-%m-%dT%H:%M:%S')
 
         event = self._service.events().insert(calendarId=self._calendar_id, body=event_body).execute()
         return event.get('id')
