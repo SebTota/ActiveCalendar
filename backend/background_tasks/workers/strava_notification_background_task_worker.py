@@ -9,6 +9,7 @@ from backend.core import logger
 from backend.db.session import SessionLocal
 from backend.models import StravaCredentials
 from backend.models.calendar_template import CalendarTemplateType
+from backend.schemas import CalendarEventCreate, StravaNotificationAction, CalendarEventUpdate
 from backend.utils import calendar_template_utils
 from backend.utils.date_utils import beginning_of_day_in_utc, end_of_day_in_utc
 
@@ -60,31 +61,39 @@ class StravaNotificationBackgroundTaskWorker:
         gen_title_template: str = calendar_template_utils.fill_template(activity_template.title_template, activity)
         gen_body_template: str = calendar_template_utils.fill_template(activity_template.body_template, activity)
 
-        notification_action: schemas.StravaNotificationAction = self.notification.action
-        if notification_action == schemas.StravaNotificationAction.update:
-            existing_calendar_event: Optional[models.CalendarEvent] = crud.calendar_event.get_by_strava_event_id(self._db, activity.id)
+        notification_action: StravaNotificationAction = self.notification.action
+        if notification_action == StravaNotificationAction.update:
+            existing_calendar_event: Optional[models.CalendarEvent] = crud.calendar_event.get_by_strava_event_id(
+                self._db, activity.id)
             if existing_calendar_event is None:
                 # We received an update event, but we haven't processed this Strava event before, so we are treating
                 # it as a new event.
-                notification_action = schemas.StravaNotificationAction.create
+                notification_action = StravaNotificationAction.create
             else:
-                cal_event_id: str = self._cal_accessor.update_event(existing_calendar_event.calendar_event_id,
-                                                                    gen_title_template,
-                                                                    gen_body_template,
-                                                                    str(activity.timezone),
-                                                                    activity.start_date_local,
-                                                                    (activity.start_date_local + activity.moving_time),
-                                                                    False)
-                logger.info(f"Updated calendar activity: {existing_calendar_event.calendar_event_id}. "
-                            f"The new id is: {cal_event_id}.")
+                self._cal_accessor.update_event(existing_calendar_event.calendar_event_id,
+                                                gen_title_template,
+                                                gen_body_template,
+                                                str(activity.timezone),
+                                                activity.start_date_local,
+                                                (activity.start_date_local + activity.moving_time),
+                                                False)
+                logger.info(
+                    f"Updated calendar event: {existing_calendar_event.calendar_event_id} for user: {self._user_id}.")
 
-        if notification_action == schemas.StravaNotificationAction.create:
+        if notification_action == StravaNotificationAction.create:
             cal_event_id: str = self._cal_accessor.add_event(gen_title_template,
                                                              gen_body_template,
                                                              str(activity.timezone),
                                                              activity.start_date_local,
                                                              (activity.start_date_local + activity.moving_time),
                                                              False)
+
+            cal_event_create: CalendarEventCreate = CalendarEventCreate(calendar_event_id=cal_event_id,
+                                                                        strava_event_id=activity.id,
+                                                                        start_date=activity.start_date,
+                                                                        end_date=(activity.start_date + activity.moving_time))
+
+            crud.calendar_event.create_and_add_to_user(db=self._db, user_id=self._user_id, obj_create=cal_event_create)
             logger.debug(f"Created new activity calendar event: {cal_event_id} "
                          f"for user: {self._user_id} and Strava activity: {activity}.")
 
