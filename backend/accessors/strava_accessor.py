@@ -66,9 +66,12 @@ class StravaAccessor:
         self._before_api_call()
         return self._client.get_athlete()
 
-    def get_activities(self, before=None, after=None, limit=None):
+    def get_activities(self, after: datetime, before: datetime, limit: int = 20) -> [Activity]:
         self._before_api_call()
-        return self._client.get_activities(before, after, limit)
+        activities: [Activity] = list(self._client.get_activities(before, after, limit))
+        for activity in activities:
+            activity.start_date_local = pytz.timezone(str(activity.timezone)).localize(activity.start_date_local)
+        return activities
 
     def get_activity(self, activity_id) -> Activity:
         self._before_api_call()
