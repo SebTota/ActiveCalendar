@@ -91,29 +91,6 @@ class GoogleCalendarAccessor:
         created_calendar_id = self._service.calendars().insert(body=calendar).execute()['id']
         return created_calendar_id
 
-    def add_all_day_event(self, name: str, description: str, timezone: str, date: str) -> str:
-        """
-        Add an all day calendar event
-        :param name: name of the calendar event
-        :param description: description of the calendar event
-        :param timezone: timezone of where the event happened
-        :param date: date of the event
-        :return: the id of the calendar event or '-1' on error
-        """
-        return self.add_event(name, description, timezone, date, date)
-
-    def update_all_day_event(self, event_id: str, name: str, description: str, timezone: str, date: str) -> str:
-        """
-        Update an all day calendar event
-        :param event_id: the calendar event id that will be updated
-        :param name: name of the calendar event
-        :param description: description of the calendar event
-        :param timezone: timezone of where the event happened
-        :param date: date of the event
-        :return: the id of the calendar event or '-1' on error
-        """
-        return self.update_event(event_id, name, description, timezone, date, date)
-
     def add_event(self, name: str, description: str, timezone: str, start_date: datetime, end_date: datetime, is_all_day_event: bool) -> str:
         """
         Add a new calendar event
@@ -141,15 +118,9 @@ class GoogleCalendarAccessor:
         event = self._service.events().insert(calendarId=self._calendar_id, body=event_body).execute()
         return event.get('id')
 
-    def update_event(self, event_id: str, name: str, description: str, timezone: str, start: str, end: str) -> str:
+    def update_event(self, event_id: str, name: str, description: str, timezone: str, start_date: datetime, end_date: datetime, is_all_day_event: bool) -> str:
         """
-        Update a calendar event for the signed in user
-        :param event_id: the id of the calendar event to update
-        :param name: new name of the calendar event
-        :param description: new description of the calendar event
-        :param timezone: new timezone of where the event happened
-        :param start: new start datetime of the event
-        :param end: new end datetime of the event
+        Update a calendar event
         :return: the id of the calendar event or '-1' on error
         """
         self._before_each_request()
@@ -164,14 +135,12 @@ class GoogleCalendarAccessor:
             }
         }
 
-        if len(start) == 10 and len(end) == 10:
-            event_body['start']['date'] = start
-            event_body['end']['date'] = end
-        elif len(start) == 19 and len(end) == 19:
-            event_body['start']['dateTime'] = start
-            event_body['end']['dateTime'] = end
+        if is_all_day_event:
+            event_body['start']['date'] = start_date.strftime('%Y-%m-%d')
+            event_body['end']['date'] = end_date.strftime('%Y-%m-%d')
         else:
-            return '-1'
+            event_body['start']['dateTime'] = start_date.strftime('%Y-%m-%dT%H:%M:%S')
+            event_body['end']['dateTime'] = end_date.strftime('%Y-%m-%dT%H:%M:%S')
 
         event = self._service.events().update(calendarId=self._calendar_id, eventId=event_id, body=event_body).execute()
         return event.get('id')

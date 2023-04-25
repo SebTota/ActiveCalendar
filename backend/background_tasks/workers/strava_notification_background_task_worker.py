@@ -48,21 +48,45 @@ class StravaNotificationBackgroundTaskWorker:
             template: models.CalendarTemplate = templates.pop(CalendarTemplateType.ACTIVITY_SUMMARY)
             self._process_activity_template(activity, template)
 
-        for template_type, template in templates.items():
-            self._process_summary_template(activity, template, template_type)
+        # There is nothing to change on an activity update for the summary templates, so we will take
+        #  no actions on the summary events on update.
+        # TODO: Add event deletion to here by simply repulling all events and re-creating the calendar
+        #  event with the new list of events.
+        if self.notification.action == schemas.StravaNotificationAction.create:
+            for template_type, template in templates.items():
+                self._process_summary_template(activity, template, template_type)
 
     def _process_activity_template(self, activity: Activity, activity_template: models.CalendarTemplate):
         gen_title_template: str = calendar_template_utils.fill_template(activity_template.title_template, activity)
         gen_body_template: str = calendar_template_utils.fill_template(activity_template.body_template, activity)
 
-        cal_event_id: str = self._cal_accessor.add_event(gen_title_template,
-                                                         gen_body_template,
-                                                         str(activity.timezone),
-                                                         activity.start_date_local,
-                                                         (activity.start_date_local + activity.moving_time),
-                                                         False)
-        logger.debug(f"Created new activity calendar event: {cal_event_id} "
-                     f"for user: {self._user_id} and Strava activity: {activity}.")
+        notification_action: schemas.StravaNotificationAction = self.notification.action
+        if notification_action == schemas.StravaNotificationAction.update:
+            existing_calendar_event: Optional[models.CalendarEvent] = crud.calendar_event.get_by_strava_event_id(self._db, activity.id)
+            if existing_calendar_event is None:
+                # We received an update event, but we haven't processed this Strava event before, so we are treating
+                # it as a new event.
+                notification_action = schemas.StravaNotificationAction.create
+            else:
+                cal_event_id: str = self._cal_accessor.update_event(existing_calendar_event.calendar_event_id,
+                                                                    gen_title_template,
+                                                                    gen_body_template,
+                                                                    str(activity.timezone),
+                                                                    activity.start_date_local,
+                                                                    (activity.start_date_local + activity.moving_time),
+                                                                    False)
+                logger.info(f"Updated calendar activity: {existing_calendar_event.calendar_event_id}. "
+                            f"The new id is: {cal_event_id}.")
+
+        if notification_action == schemas.StravaNotificationAction.create:
+            cal_event_id: str = self._cal_accessor.add_event(gen_title_template,
+                                                             gen_body_template,
+                                                             str(activity.timezone),
+                                                             activity.start_date_local,
+                                                             (activity.start_date_local + activity.moving_time),
+                                                             False)
+            logger.debug(f"Created new activity calendar event: {cal_event_id} "
+                         f"for user: {self._user_id} and Strava activity: {activity}.")
 
     def _process_summary_template(self, activity: Activity,
                                   activity_template: models.CalendarTemplate, summary_type: CalendarTemplateType):
