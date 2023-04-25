@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import google_auth_oauthlib.flow
 from fastapi import APIRouter, Depends, Request, HTTPException
@@ -11,7 +12,7 @@ from backend.api import deps
 from backend.core import logger
 from backend.core.config import settings
 from backend.accessors.google_calendar_accessor import SCOPES as GOOGLE_CALENDAR_AUTH_SCOPES
-
+from backend.models import GoogleAuth
 
 router = APIRouter()
 
@@ -40,8 +41,6 @@ def google_auth_callback(request: Request,
                          state: str,
                          db: Session = Depends(deps.get_db),
                          current_user: models.User = Depends(deps.get_current_active_user)):
-    # TODO: Delete existing google_auth from db if user authenticated with Google before
-
     try:
         flow: google_auth_oauthlib.flow.Flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
             GOOGLE_CONFIG_PATH,
@@ -57,8 +56,13 @@ def google_auth_callback(request: Request,
         logger.error(f"Failed to authenticate user during Google auth request callback. {e}")
         raise HTTPException(status_code=403, detail="Failed to authenticate user during Google auth request callback.")
 
-    google_credentials = flow.credentials
+    existing_auth: Optional[GoogleAuth] = crud.google_auth.get_for_user(current_user.id)
+    if existing_auth:
+        logger.debug(f"Removing Google auth for user: {current_user.id} because user is trying to "
+                     f"re-authenticate with Google.")
+        crud.google_auth.remove(db=db, id=existing_auth.id)
 
+    google_credentials = flow.credentials
     google_auth: schemas.GoogleAuthCreate = schemas.GoogleAuthCreate(
         token=google_credentials.token,
         token_uri=google_credentials.token_uri,
