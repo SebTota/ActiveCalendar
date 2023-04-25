@@ -15,6 +15,11 @@ class CRUDCalendarTemplate(CRUDBase[CalendarTemplate, CalendarTemplateCreate, Ca
                              user_id: str, template_type: CalendarTemplateType) -> Optional[CalendarTemplate]:
         return db.query(CalendarTemplate).filter(User.id == user_id, CalendarTemplate.type == template_type).first()
 
+    def get_activity_template(self, db: Session, user_id: str) -> Optional[CalendarTemplate]:
+        return db.query(CalendarTemplate).filter(User.id == user_id,
+                                                 CalendarTemplate.status == CalendarTemplateStatus.ACTIVE,
+                                                 CalendarTemplate.type == CalendarTemplateType.ACTIVITY_SUMMARY).first()
+
     def get_all_active_templates(self, db: Session, user_id: str) -> dict:
         """
         Get a dictionary that contains all the active templates for a given user.
