@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from requests import Session
+import pytz
 from stravalib.client import Client
 from stravalib.model import Athlete, Activity
 
@@ -72,4 +72,8 @@ class StravaAccessor:
 
     def get_activity(self, activity_id) -> Activity:
         self._before_api_call()
-        return self._client.get_activity(activity_id=activity_id)
+        activity: Activity = self._client.get_activity(activity_id=activity_id)
+
+        # Localize the start_date_local variable
+        activity.start_date_local = pytz.timezone(str(activity.timezone)).localize(activity.start_date_local)
+        return activity
