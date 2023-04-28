@@ -71,8 +71,6 @@ sniffio==1.2.0
 SQLAlchemy==2.0.9
 sqlalchemy-orm==1.2.5
 starlette==0.17.1
--e git+https://github.com/SebTota/StravaCalendarSummaryDataAccessLayer@95f56ff9dae0e5732cde3f03292b4055e5fd41e5#egg=strava_calendar_summary_data_access_layer
--e git+https://github.com/SebTota/StravaCalendarSummaryUtils@0d44d5c5ff3bfae243aca805075da1dc6eb0c79f#egg=strava_calendar_summary_utils
 stravalib==0.10.4
 typing-extensions==4.2.0
 typing-inspect==0.8.0
