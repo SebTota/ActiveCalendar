@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 class StravaCredentials(Base):
     id = Column(Integer, primary_key=True, index=True)  # Also the athlete's Strava id
-    access_token = Column(String, nullable=False)
+    access_token = Column(String(1024), nullable=False)
     expires_at = Column(DateTime, nullable=False)
-    refresh_token = Column(String, nullable=False)
+    refresh_token = Column(String(1024), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     user: Mapped["User"] = relationship(back_populates="strava_credentials")

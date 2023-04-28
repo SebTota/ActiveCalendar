@@ -1,7 +1,7 @@
 import enum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, String, DateTime, ForeignKey, Enum
+from sqlalchemy import Column, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from backend.db.base_class import Base
