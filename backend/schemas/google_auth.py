@@ -7,9 +7,6 @@ from pydantic import BaseModel
 # Shared properties
 class GoogleAuthBase(BaseModel):
     token: Optional[str]
-    token_uri: Optional[str]
-    client_id: Optional[str]
-    client_secret: Optional[str]
     expiry: Optional[datetime.datetime]
     refresh_token: Optional[str]
     scopes: Optional[list]
@@ -17,9 +14,6 @@ class GoogleAuthBase(BaseModel):
 
 class GoogleAuthCreate(BaseModel):
     token: str
-    token_uri: str
-    client_id: str
-    client_secret: str
     expiry: datetime.datetime
     refresh_token: str
     scopes: List[str]

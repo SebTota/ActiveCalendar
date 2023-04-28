@@ -63,17 +63,14 @@ def google_auth_callback(request: Request,
         crud.google_auth.remove(db=db, id=existing_auth.id)
 
     google_credentials = flow.credentials
-    google_auth: schemas.GoogleAuthCreate = schemas.GoogleAuthCreate(
+    google_auth_create: schemas.GoogleAuthCreate = schemas.GoogleAuthCreate(
         token=google_credentials.token,
-        token_uri=google_credentials.token_uri,
-        client_id=google_credentials.client_id,
-        client_secret=google_credentials.client_secret,
         expiry=google_credentials.expiry,
         refresh_token=google_credentials.refresh_token,
         scopes=google_credentials.scopes
     )
 
-    crud.google_auth.create_and_add_to_user(db, current_user.id, google_auth)
+    crud.google_auth.create_and_add_to_user(db, current_user.id, google_auth_create)
 
     return schemas.Msg(msg="Authenticated Google Auth")
 

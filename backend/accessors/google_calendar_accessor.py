@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Union, Optional
 
 from sqlalchemy.orm import Session
 
@@ -9,6 +9,7 @@ from google.oauth2.credentials import Credentials
 from backend.core import logger
 
 from backend import schemas, crud
+from backend.core.config import settings
 from backend.models import GoogleAuth
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.app.created',
@@ -21,22 +22,22 @@ class GoogleCalendarAccessor:
         """
         Init GoogleCalendarAccessor for Google Calendar API Calls
         """
-        self._db = db
-        self._google_auth = google_auth
+        self._db: Session = db
+        self._google_auth: GoogleAuth = google_auth
 
         self._refresh_creds_if_needed()
         self._service: build = build('calendar', 'v3', credentials=self._get_credentials())
 
-        self._calendar_id = self._get_app_calendar_id(CALENDAR_NAME)
+        self._calendar_id: Optional[str] = self._get_app_calendar_id(CALENDAR_NAME)
         if self._calendar_id is None:
             self._calendar_id = self._create_app_calendar(CALENDAR_NAME)
 
     def _get_credentials(self) -> Credentials:
         return Credentials(token=self._google_auth.token,
-                           token_uri=self._google_auth.token_uri,
-                           client_id=self._google_auth.client_id,
+                           token_uri=settings.GOOGLE_OAUTH_TOKEN_URI,
+                           client_id=settings.GOOGLE_OAUTH_CLIENT_ID,
+                           client_secret=settings.GOOGLE_OAUTH_CLIENT_SECRET,
                            expiry=self._google_auth.expiry,
-                           client_secret=self._google_auth.client_secret,
                            refresh_token=self._google_auth.refresh_token,
                            scopes=self._google_auth.scopes)
 
@@ -49,9 +50,6 @@ class GoogleCalendarAccessor:
             logger.info(f"Refreshing Google credentials for user: {self._google_auth.user_id}.")
             creds.refresh(Request())
             changes: schemas.GoogleAuthUpdate = schemas.GoogleAuthUpdate(token=creds.token,
-                                                                         token_uri=creds.token_uri,
-                                                                         client_id=creds.client_id,
-                                                                         client_secret=creds.client_secret,
                                                                          expiry=creds.expiry,
                                                                          refresh_token=creds.refresh_token,
                                                                          scopes=creds.scopes)
@@ -70,7 +68,6 @@ class GoogleCalendarAccessor:
             calendars = self._service.calendarList().list(pageToken=page_token).execute()
             for calendar in calendars['items']:
                 if calendar['summary'] == calendar_name:
-                    print('found existing calendar')
                     return calendar['id']
             if not page_token:
                 return None
