@@ -54,12 +54,3 @@ jobs:
         gcloud compute instances update-container "$GCE_INSTANCE" \
           --zone "$GCE_INSTANCE_ZONE" \
           --container-image "us-central1-docker.pkg.dev/$PROJECT_ID/strava-calendar-summary-web-service-container/$IMAGE_NAME:$GITHUB_SHA" \
-          --container-env "STRAVA_CLIENT_ID=${{ secrets.STRAVA_CLIENT_ID }}" \
-          --container-env "STRAVA_CLIENT_SECRET=${{ secrets.STRAVA_CLIENT_SECRET }}" \
-          --container-env "STRAVA_WEBHOOK_VERIFICATION_TOKEN=${{ secrets.STRAVA_WEBHOOK_VERIFICATION_TOKEN }}" \
-          --container-env "STRAVA_SUBSCRIPTION_ID=${{ secrets.STRAVA_SUBSCRIPTION_ID }}" \
-          --container-env "GOOGLE_CLOUD_PROJECT=${{ secrets.GOOGLE_CLOUD_PROJECT }}" \
-          --container-env "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
-          --container-env "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
-          --container-env "COOKIE_SECRET_KEY=${{ secrets.COOKIE_SECRET_KEY }}" \
-          --container-env "UI_BASE_URL=${{ secrets.UI_BASE_URL }}"

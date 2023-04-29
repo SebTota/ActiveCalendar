@@ -19,14 +19,6 @@
             "action": {
                 "pass": "applications/backend"
             }
-        },
-        {
-            "action": {
-                "share": "/frontend/$uri",
-                "fallback": {
-                    "share": "/frontend/index.html"
-                }
-            }
         }
     ],
     "applications": {

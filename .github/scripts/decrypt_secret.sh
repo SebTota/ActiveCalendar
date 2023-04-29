@@ -1,3 +1,4 @@
 #!/bin/sh
 gpg --quiet --batch --yes --decrypt --passphrase="$SECRET_PASSPHRASE" --output .env .env.gpg
 gpg --quiet --batch --yes --decrypt --passphrase="$SECRET_PASSPHRASE" --output backend/client_secret.json backend/client_secret.json.gpg
+gpg --quiet --batch --yes --decrypt --passphrase="$SECRET_PASSPHRASE" --output nginx/bundle.pem nginx/bundle.pem.gpg
