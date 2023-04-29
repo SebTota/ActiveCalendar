@@ -48,7 +48,7 @@ class StravaNotificationBackgroundTaskWorker:
                                                                                                self._user_id)
         if CalendarTemplateType.ACTIVITY_SUMMARY in templates.keys():
             template: models.CalendarTemplate = templates.pop(CalendarTemplateType.ACTIVITY_SUMMARY)
-            # self._process_activity_template(activity, template)
+            self._process_activity_template(activity, template)
 
         # There is nothing to change on an activity update for the summary templates, so we will take
         #  no actions on the summary events on update.
