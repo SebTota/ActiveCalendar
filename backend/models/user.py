@@ -19,12 +19,17 @@ class UserStatus(str, enum.Enum):
     INACTIVE = 'INACTIVE'
 
 
+class AuthProvider(str, enum.Enum):
+    GOOGLE = 'GOOGLE'
+
+
 class User(Base):
     id = Column(String(length=12), primary_key=True, index=True)
-    first_name = Column(String(length=50), index=True, nullable=False)
-    last_name = Column(String(length=50), index=True, nullable=False)
+    first_name = Column(String(length=100), index=True, nullable=False)
+    last_name = Column(String(length=100), index=True, nullable=False)
     email = Column(String(length=254), unique=True, index=True, nullable=False)
-    hashed_password = Column(String(70), nullable=False)
+    auth_provider = Column(Enum(AuthProvider), nullable=False)
+    auth_provider_id = Column(String(length=256), nullable=False)
     status = Column(Enum(UserStatus), nullable=False)
     is_superuser = Column(Boolean(), default=False, nullable=False)
     strava_credentials = relationship("StravaCredentials", back_populates="user", cascade="all, delete-orphan")

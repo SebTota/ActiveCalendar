@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = '/api/v1'
     API_HOST: str = f'http://localhost{API_V1_STR}'
     GOOGLE_CALENDAR_AUTH_CALLBACK_URL: str = f'{API_HOST}/google/calendar/callback'
+    GOOGLE_OAUTH_CALLBACK_URL: str = f'{API_HOST}/google/callback'
     STRAVA_AUTH_CALLBACK_URL: str = f'{API_HOST}/strava/callback'
 
     SECRET_KEY: str = os.getenv('API_CREDENTIALS_GENERATOR_SECRET_KEY')

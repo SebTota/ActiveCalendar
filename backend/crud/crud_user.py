@@ -13,15 +13,19 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, db: Session, email: str) -> Optional[User]:
         return db.query(User).filter(User.email == email).first()
 
-    def create(self, db: Session, obj_in: UserCreate) -> User:
+    def create_user(self, db: Session,
+                    obj_in: UserCreate,
+                    status: UserStatus = UserStatus.ACTIVE.value,
+                    is_superuser: bool = False) -> User:
         db_obj = User(
             id=get_random_alphanumeric_string(12),
             first_name=obj_in.first_name,
             last_name=obj_in.last_name,
             email=obj_in.email,
-            hashed_password=get_password_hash(obj_in.password),
-            status=UserStatus.PENDING_EMAIL_VERIFICATION.value,
-            is_superuser=False,
+            auth_provider=obj_in.auth_provider,
+            auth_provider_id=obj_in.auth_provider_id,
+            status=status,
+            is_superuser=is_superuser,
         )
         db.add(db_obj)
         db.commit()
@@ -29,7 +33,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return db_obj
 
     def update(
-        self, db: Session, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]
+            self, db: Session, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]
     ) -> User:
         if isinstance(obj_in, dict):
             update_data = obj_in
