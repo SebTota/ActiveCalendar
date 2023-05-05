@@ -7,4 +7,3 @@ from .strava_notification import StravaNotification, StravaNotificationType, Str
 from .google_auth import GoogleAuth, GoogleAuthCreate, GoogleAuthUpdate, GoogleAuthInDB
 from .calendar_template import CalendarTemplate, CalendarTemplateCreate, CalendarTemplateUpdate, CalendarTemplateInDB, \
     CalendarTemplateType, CalendarTemplateBase
-from .calendar_event import CalendarEvent, CalendarEventCreate, CalendarEventUpdate, CalendarEventInDB
