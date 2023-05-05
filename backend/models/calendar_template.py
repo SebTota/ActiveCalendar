@@ -1,10 +1,7 @@
 import enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Column, String, ForeignKey, Enum
-from sqlalchemy.orm import relationship, Mapped, mapped_column
-
-from backend.db.base_class import Base
+from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
     from .user import User  # noqa: F401
@@ -21,11 +18,22 @@ class CalendarTemplateStatus(str, enum.Enum):
     DISABLED = 'DISABLED'
 
 
-class CalendarTemplate(Base):
-    id: Mapped[str] = Column(String(12), primary_key=True, index=True)
-    status: Mapped[CalendarTemplateStatus] = Column(Enum(CalendarTemplateStatus), index=True, nullable=False)
-    type: Mapped[CalendarTemplateType] = Column(Enum(CalendarTemplateType), index=True, nullable=False)
-    title_template: Mapped[str] = Column(String, nullable=False)
-    body_template: Mapped[str] = Column(String, nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    user: Mapped["User"] = relationship(back_populates="calendar_templates")
+class CalendarTemplateBase(SQLModel):
+    status: CalendarTemplateStatus = Field(index=True, nullable=False)
+    type: CalendarTemplateType = Field(index=True, nullable=False)
+    title_template: str = Field(nullable=False)
+    body_template: str = Field(nullable=False)
+    user_id: str = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="calendar_templates")
+
+
+class CalendarTemplate(CalendarTemplateBase, table=True):
+    id: Optional[str] = Field(default=None, primary_key=True)
+
+
+class CalendarTemplateCreate(CalendarTemplateBase):
+    pass
+
+
+class CalendarTemplateRead(CalendarTemplateBase):
+    id: str

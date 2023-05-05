@@ -17,7 +17,7 @@ class CalendarEventBase(SQLModel):
 
 
 class CalendarEvent(CalendarEventBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[str] = Field(default=None, primary_key=True)
 
 
 class CalendarEventCreate(CalendarEventBase):
@@ -25,4 +25,4 @@ class CalendarEventCreate(CalendarEventBase):
 
 
 class CalendarEventRead(CalendarEventBase):
-    id: int
+    id: str
