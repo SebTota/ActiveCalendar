@@ -20,13 +20,13 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 GOOGLE_CONFIG_PATH = os.path.join(ROOT_DIR, '../../../client_secret.json')
 
 
-@router.get('/auth')
-def google_auth(db: Session = Depends(deps.get_db),
+@router.get('/calendar/auth')
+def google_calendar_auth(db: Session = Depends(deps.get_db),
                 current_user: models.User = Depends(deps.get_current_active_user)):
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         GOOGLE_CONFIG_PATH,
         scopes=GOOGLE_CALENDAR_AUTH_SCOPES)
-    flow.redirect_uri = settings.GOOGLE_AUTH_CALLBACK_URL
+    flow.redirect_uri = settings.GOOGLE_CALENDAR_AUTH_CALLBACK_URL
 
     authorization_url, state = flow.authorization_url(
         access_type='offline',
@@ -36,8 +36,8 @@ def google_auth(db: Session = Depends(deps.get_db),
     return RedirectResponse(authorization_url)
 
 
-@router.get('/callback', response_model=schemas.Msg)
-def google_auth_callback(request: Request,
+@router.get('/calendar/callback', response_model=schemas.Msg)
+def google_calendar_auth_callback(request: Request,
                          state: str,
                          db: Session = Depends(deps.get_db),
                          current_user: models.User = Depends(deps.get_current_active_user)):
