@@ -9,7 +9,7 @@ from backend.api.v1.api import api_router
 db = SessionLocal()
 init_db(db)
 
-app = FastAPI()
+app = FastAPI(openapi_url="/api/v1/openapi.json")
 
 app.add_middleware(
         CORSMiddleware,
