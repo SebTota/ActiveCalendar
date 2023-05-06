@@ -1,11 +1,11 @@
-from sqlalchemy.orm import Session
+from sqlmodel import SQLModel
 
 from backend.core import logger
-from backend.db.base_class import Base
 from backend.db.session import engine
+from backend import models  # DO NOT DELETE THIS!
 
 
-def init_db(db: Session) -> None:
-    logger.info("Creating db connection...")
-    Base.metadata.create_all(bind=engine)
-    logger.debug("Created db connection...")
+def init_db() -> None:
+    logger.info("Creating db connection and inti engine...")
+    SQLModel.metadata.create_all(engine)
+    logger.info("Created db connection...")

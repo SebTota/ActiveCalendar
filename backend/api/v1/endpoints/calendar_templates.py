@@ -1,9 +1,9 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 
-from backend import models, schemas, crud
+from backend import models, crud
 from backend.api import deps
 from backend.core import logger
 from backend.utils import calendar_template_utils

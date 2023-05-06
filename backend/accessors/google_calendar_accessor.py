@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Union, Optional
 
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
@@ -10,7 +10,7 @@ from backend.core import logger
 
 from backend import schemas, crud
 from backend.core.config import settings
-from backend.models import GoogleAuth
+from backend.models import GoogleCalendarCredentials
 
 SCOPES = ['https://www.googleapis.com/auth/calendar.app.created',
           'https://www.googleapis.com/auth/calendar.calendarlist.readonly']
@@ -18,12 +18,12 @@ CALENDAR_NAME = 'Strava Summary'
 
 
 class GoogleCalendarAccessor:
-    def __init__(self, db: Session, google_auth: GoogleAuth) -> None:
+    def __init__(self, db: Session, google_auth: GoogleCalendarCredentials) -> None:
         """
         Init GoogleCalendarAccessor for Google Calendar API Calls
         """
         self._db: Session = db
-        self._google_auth: GoogleAuth = google_auth
+        self._google_auth: GoogleCalendarCredentials = google_auth
 
         self._refresh_creds_if_needed()
         self._service: build = build('calendar', 'v3', credentials=self._get_credentials())
@@ -53,7 +53,7 @@ class GoogleCalendarAccessor:
                                                                          expiry=creds.expiry,
                                                                          refresh_token=creds.refresh_token,
                                                                          scopes=creds.scopes)
-            self._google_auth = crud.google_auth.update(db=self._db, db_obj=self._google_auth, obj_in=changes)
+            self._google_auth = crud.google_calendar_auth.update(db=self._db, db_obj=self._google_auth, obj_in=changes)
 
     def _get_app_calendar_id(self, calendar_name) -> Union[str, None]:
         """

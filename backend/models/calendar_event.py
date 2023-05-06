@@ -13,7 +13,7 @@ class CalendarEventBase(SQLModel):
     strava_event_id: Optional[int] = Field(index=True, default=None)
     calendar_event_id: str = Field(index=True, nullable=False)
     user_id: str = Field(foreign_key="user.id")
-    user: User = Relationship(back_populates="calendar_events")
+    user: "User" = Relationship(back_populates="calendar_events")
 
 
 class CalendarEvent(CalendarEventBase, table=True):

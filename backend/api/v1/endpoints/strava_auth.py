@@ -3,10 +3,10 @@ import logging
 
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import RedirectResponse
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 from stravalib.client import Client
 
-from backend import models, schemas, crud
+from backend import models, crud
 from backend.api import deps
 from backend.core.config import settings
 

@@ -1,27 +1,18 @@
 from typing import Optional
 
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 
-from backend.crud.base import CRUDBase
-from backend.models import StravaCredentials
-from backend.schemas import StravaCredentialsCreate, StravaCredentialsUpdate
+from backend.models import StravaCredentials, StravaCredentialsCreate
 
 
-class CRUDStravaCredentials(CRUDBase[StravaCredentials, StravaCredentialsCreate, StravaCredentialsUpdate]):
-    def get_by_user_id(self, db: Session, user_id: str) -> Optional[StravaCredentials]:
-        return db.query(StravaCredentials).filter(StravaCredentials.user_id == user_id).first()
-
-    def create_and_add_to_user(self, db: Session, user_id: str, strava_user_id: int,
-                               strava_credentials_obj: StravaCredentialsCreate):
-        strava_credentials_db_obj: StravaCredentials = StravaCredentials(id=strava_user_id,
-                                                                         access_token=strava_credentials_obj.access_token,
-                                                                         expires_at=strava_credentials_obj.expires_at,
-                                                                         refresh_token=strava_credentials_obj.refresh_token,
-                                                                         user_id=user_id)
-        db.add(strava_credentials_db_obj)
-        db.commit()
-        db.refresh(strava_credentials_db_obj)
-        return strava_credentials_db_obj
+def get_by_user_id(db: Session, user_id: str) -> Optional[StravaCredentials]:
+    return db.query(StravaCredentials).filter(StravaCredentials.user_id == user_id).first()
 
 
-strava_credentials = CRUDStravaCredentials(StravaCredentials)
+def create_and_add_to_user(db: Session, strava_user_id: int, obj: StravaCredentialsCreate):
+    db_obj: StravaCredentials = StravaCredentials.from_orm(obj)
+    db_obj.id = strava_user_id
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj

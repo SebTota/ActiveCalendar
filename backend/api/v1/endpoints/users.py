@@ -1,13 +1,9 @@
-from typing import Any, Optional
+from fastapi import APIRouter, Depends
+from sqlmodel import Session
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-
-from backend import crud, models, schemas
+from backend import models
 from backend.api import deps
-from backend.core.config import settings
-from backend.core.security import create_account_verification_token, confirm_account_verification_token
-from backend.utils.email_utils import send_new_account_email
+from backend.models import UserRead
 
 router = APIRouter()
 
@@ -60,7 +56,7 @@ router = APIRouter()
 #     }
 
 
-@router.get("/me", response_model=schemas.User)
+@router.get("/me", response_model=UserRead)
 def get_user_me(db: Session = Depends(deps.get_db), current_user: models.User = Depends(deps.get_current_active_user)):
     """
     Get current signed-in user

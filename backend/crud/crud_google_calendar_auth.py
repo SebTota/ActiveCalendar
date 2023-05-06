@@ -1,23 +1,32 @@
 from typing import Optional
 
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 
-from backend.models import GoogleCalendarAuth, User
+from backend.models import GoogleCalendarCredentials, User, GoogleCalendarCredentialsCreate
 from backend.utils.base_utils import get_random_alphanumeric_string
 
 
-def get_for_user(db: Session, user_id: str) -> Optional[GoogleCalendarAuth]:
-    return db.query(GoogleCalendarAuth).filter(User.id == user_id).first()
+def get_for_user(db: Session, user_id: str) -> Optional[GoogleCalendarCredentials]:
+    return db.query(GoogleCalendarCredentials).filter(User.id == user_id).first()
 
 
-def create_and_add_to_user(db: Session, user_id: str, obj: GoogleCalendarAuthCreate):
-    g
-    google_auth_db_obj: GoogleCalendarAuth = GoogleCalendarAuth(id=get_random_alphanumeric_string(12),
-                                                                token=google_auth_obj.token,
-                                                                expiry=google_auth_obj.expiry,
-                                                                refresh_token=google_auth_obj.refresh_token,
-                                                                scopes=google_auth_obj.scopes)
-    db.add(google_auth_db_obj)
+def create(db: Session, obj: GoogleCalendarCredentialsCreate) -> GoogleCalendarCredentials:
+    google_cal_auth_obj: GoogleCalendarCredentials = GoogleCalendarCredentials.from_orm(obj)
+    google_cal_auth_obj.id = get_random_alphanumeric_string(12)
+    db.add(google_cal_auth_obj)
     db.commit()
-    db.refresh(google_auth_db_obj)
-    return google_auth_db_obj
+    db.refresh(google_cal_auth_obj)
+    return google_cal_auth_obj
+
+
+def remove(db: Session, obj: GoogleCalendarCredentials) -> GoogleCalendarCredentials:
+    db.delete(obj)
+    db.commit()
+    return obj
+
+
+def update(db: Session, obj: GoogleCalendarCredentials) -> GoogleCalendarCredentials:
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj

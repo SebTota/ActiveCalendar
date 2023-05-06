@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 
 from backend.models import CalendarEvent, User, CalendarEventCreate
 from backend.utils.base_utils import get_random_alphanumeric_string

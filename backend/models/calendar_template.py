@@ -24,7 +24,7 @@ class CalendarTemplateBase(SQLModel):
     title_template: str = Field(nullable=False)
     body_template: str = Field(nullable=False)
     user_id: str = Field(foreign_key="user.id")
-    user: User = Relationship(back_populates="calendar_templates")
+    user: "User" = Relationship(back_populates="calendar_templates")
 
 
 class CalendarTemplate(CalendarTemplateBase, table=True):

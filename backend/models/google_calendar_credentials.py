@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Set
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -11,9 +11,9 @@ class GoogleCalendarCredentialsBase(SQLModel):
     token: str = Field(index=True, nullable=False)
     expiry: datetime = Field(index=True, nullable=False)
     refresh_token: str = Field(index=True, nullable=False)
-    scopes: [str] = Field(index=True, nullable=False)
+    scopes: Set[str] = Field(index=True, nullable=False)
     user_id: str = Field(foreign_key="user.id", nullable=False)
-    user: User = Relationship(back_populates="google_calendar_credentials")
+    user: "User" = Relationship(back_populates="calendar_credentials")
 
 
 class GoogleCalendarCredentials(GoogleCalendarCredentialsBase, table=True):

@@ -12,7 +12,7 @@ class StravaCredentialsBase(SQLModel):
     expires_at: datetime = Field(nullable=False)
     refresh_token: datetime = Field(nullable=False)
     user_id: str = Field(foreign_key="user.id", nullable=False)
-    user: User = Relationship(back_populates="strava_credentials")
+    user: "User" = Relationship(back_populates="strava_credentials")
 
 
 class StravaCredentials(StravaCredentialsBase, table=True):
