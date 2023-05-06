@@ -6,16 +6,17 @@ from sqlmodel import Session
 from backend import models, crud
 from backend.api import deps
 from backend.core import logger
+from backend.models import CalendarTemplateCreate, CalendarTemplate, User, CalendarTemplateUpdate
 from backend.utils import calendar_template_utils
 
 router = APIRouter()
 
 
-@router.post('/', response_model=schemas.CalendarTemplate)
-def create_new_calendar_template(calendar_template: schemas.CalendarTemplateCreate,
+@router.post('/', response_model=CalendarTemplate)
+def create_new_calendar_template(calendar_template: CalendarTemplateCreate,
                                  db: Session = Depends(deps.get_db),
-                                 current_user: models.User = Depends(deps.get_current_active_user)):
-    existing_template: Optional[models.CalendarTemplate] = \
+                                 current_user: User = Depends(deps.get_current_active_user)):
+    existing_template: Optional[CalendarTemplate] = \
         crud.calendar_template.get_template_by_type(db, current_user.id, calendar_template.type)
 
     if existing_template is not None:
@@ -26,12 +27,13 @@ def create_new_calendar_template(calendar_template: schemas.CalendarTemplateCrea
 
     _validate_template(calendar_template)
 
-    template = crud.calendar_template.create_and_add_to_user(db, current_user.id, calendar_template)
+    calendar_template.user_id = current_user.id
+    template = crud.calendar_template.create_and_add_to_user(db, calendar_template)
     return template
 
 
-@router.post('/{id}', response_model=schemas.CalendarTemplate)
-def update_calendar_template(template_updates: schemas.CalendarTemplateUpdate,
+@router.post('/{id}', response_model=CalendarTemplate)
+def update_calendar_template(template_updates: CalendarTemplateUpdate,
                              id: str,
                              db: Session = Depends(deps.get_db),
                              current_user: models.User = Depends(deps.get_current_active_user)):
@@ -44,11 +46,11 @@ def update_calendar_template(template_updates: schemas.CalendarTemplateUpdate,
         raise HTTPException(status_code=401, detail="You do not have the permission to modify this template.")
 
     _validate_template(template_updates)
-    template = crud.calendar_template.update(db=db, db_obj=existing_template, obj_in=template_updates)
+    template = crud.calendar_template.update(db=db, obj_id=existing_template.id, obj=template_updates)
     return template
 
 
-def _validate_template(template: schemas.CalendarTemplateBase) -> [Optional[str]]:
+def _validate_template(template) -> [Optional[str]]:
     invalid_title_keys: [str] = []
     invalid_body_keys: [str] = []
 

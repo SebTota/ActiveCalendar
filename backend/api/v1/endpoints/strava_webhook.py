@@ -2,11 +2,11 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
 
-from backend import schemas
 from backend.core import logger
 from backend.core.config import settings
 from backend.background_tasks.strava_notification_background_task_processor import \
     StravaNotificationBackgroundTaskProcessor
+from backend.models import StravaNotification, StravaNotificationType, StravaNotificationAction
 
 router = APIRouter()
 strava_notification_processor: StravaNotificationBackgroundTaskProcessor = StravaNotificationBackgroundTaskProcessor()
@@ -49,10 +49,10 @@ async def get_activity_webhook(request: Request, background_tasks: BackgroundTas
                      'is different than expected. Provided subscription_id={}'.format(subscription_id))
         raise HTTPException(status_code=400, detail='Invalid subscription id')
 
-    strava_notification: schemas.StravaNotification = schemas.StravaNotification(
-        type=schemas.StravaNotificationType[body['object_type']],
+    strava_notification: StravaNotification = StravaNotification(
+        type=StravaNotificationType[body['object_type']],
         object_id=body['object_id'],
-        action=schemas.StravaNotificationAction[body['aspect_type']],
+        action=StravaNotificationAction[body['aspect_type']],
         updates=body['updates'] if 'updates' in body else {},
         owner_id=int(body['owner_id']),
         event_time=datetime.fromtimestamp((int(body['event_time'])), timezone.utc)

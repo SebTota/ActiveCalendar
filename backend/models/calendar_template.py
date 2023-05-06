@@ -37,3 +37,10 @@ class CalendarTemplateCreate(CalendarTemplateBase):
 
 class CalendarTemplateRead(CalendarTemplateBase):
     id: str
+
+
+class CalendarTemplateUpdate(SQLModel):
+    status: Optional[CalendarTemplateStatus] = None
+    type: Optional[CalendarTemplateType] = None
+    title_template: Optional[str] = None
+    body_template: Optional[str] = None

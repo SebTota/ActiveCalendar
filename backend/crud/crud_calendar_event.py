@@ -20,13 +20,13 @@ def get_by_start_and_end_date(db: Session,
                                           CalendarEvent.end_date == end_date).first()
 
 
-def create_and_add_to_user(db: Session, obj_create: CalendarEventCreate):
+def create_and_add_to_user(db: Session, obj: CalendarEventCreate):
     new_obj: CalendarEvent = CalendarEvent(id=get_random_alphanumeric_string(20),
-                                           start_date=obj_create.start_date,
-                                           end_date=obj_create.end_date,
-                                           strava_event_id=obj_create.strava_event_id,
-                                           calendar_event_id=obj_create.calendar_event_id,
-                                           user_id=obj_create.user_id)
+                                           start_date=obj.start_date,
+                                           end_date=obj.end_date,
+                                           strava_event_id=obj.strava_event_id,
+                                           calendar_event_id=obj.calendar_event_id,
+                                           user_id=obj.user_id)
     db.add(new_obj)
     db.commit()
     db.refresh(new_obj)

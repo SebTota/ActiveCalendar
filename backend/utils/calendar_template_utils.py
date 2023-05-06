@@ -5,8 +5,7 @@ import re
 import logging
 import time
 
-from backend import schemas
-from backend.schemas import CalendarTemplateType
+from backend.models import CalendarTemplateType
 
 VALID_ACTIVITIES: list = [t.lower() for t in stravalib.model.Activity.TYPES]
 

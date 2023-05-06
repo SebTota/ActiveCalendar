@@ -5,6 +5,10 @@ from sqlmodel import Session
 from backend.models import StravaCredentials, StravaCredentialsCreate
 
 
+def get(db: Session, obj_id: int) -> Optional[StravaCredentials]:
+    return db.query(StravaCredentials).filter(StravaCredentials.id == obj_id).first()
+
+
 def update(db: Session, obj: StravaCredentials) -> StravaCredentials:
     db.add(obj)
     db.commit()
