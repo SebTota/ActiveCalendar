@@ -6,6 +6,10 @@ from backend.models.user import User, UserStatus, UserCreate
 from backend.utils import get_random_alphanumeric_string
 
 
+def get(db: Session, user_id: str) -> Optional[User]:
+    return db.query(User).filter(User.id == user_id).first()
+
+
 def get_by_email(db: Session, email: str) -> Optional[User]:
     return db.query(User).filter(User.email == email).first()
 

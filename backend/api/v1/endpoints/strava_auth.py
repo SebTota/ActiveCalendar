@@ -9,6 +9,7 @@ from stravalib.client import Client
 from backend import models, crud
 from backend.api import deps
 from backend.core.config import settings
+from backend.models import Msg, StravaCredentialsCreate
 
 router = APIRouter()
 
@@ -16,14 +17,14 @@ router = APIRouter()
 @router.get('/auth')
 def strava_auth(current_user: models.User = Depends(deps.get_current_active_user)):
     auth_url = Client().authorization_url(
-            client_id=int(settings.STRAVA_CLIENT_ID),
-            redirect_uri=settings.STRAVA_AUTH_CALLBACK_URL,
-            scope=['read', 'activity:read_all'])
+        client_id=int(settings.STRAVA_CLIENT_ID),
+        redirect_uri=settings.STRAVA_AUTH_CALLBACK_URL,
+        scope=['read', 'activity:read_all'])
 
     return RedirectResponse(auth_url + '&approval_prompt=auto')
 
 
-@router.get('/callback', response_model=schemas.Msg)
+@router.get('/callback', response_model=Msg)
 def strava_auth_callback(code: str,
                          db: Session = Depends(deps.get_db),
                          current_user: models.User = Depends(deps.get_current_active_user)):
@@ -50,10 +51,11 @@ def strava_auth_callback(code: str,
         raise HTTPException(status_code=500,
                             detail='Failed to retrieve athlete details during authentication.')
 
-    strava_credentials: schemas.StravaCredentialsCreate = schemas.StravaCredentialsCreate(access_token=access_token,
-                                                                                          expires_at=expires_at,
-                                                                                          refresh_token=refresh_token)
+    strava_credentials: StravaCredentialsCreate = StravaCredentialsCreate(access_token=access_token,
+                                                                          expires_at=expires_at,
+                                                                          refresh_token=refresh_token,
+                                                                          user_id=current_user.id)
 
-    crud.strava_credentials.create_and_add_to_user(db, current_user.id, athlete_id, strava_credentials)
+    crud.strava_credentials.create_and_add_to_user(db=db, strava_user_id=athlete_id, obj=strava_credentials)
 
-    return schemas.Msg(msg="Authenticated.")
+    return Msg(msg="Authenticated.")

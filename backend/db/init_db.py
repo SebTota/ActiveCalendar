@@ -6,6 +6,6 @@ from backend import models  # DO NOT DELETE THIS!
 
 
 def init_db() -> None:
-    logger.info("Creating db connection and inti engine...")
+    logger.info("Creating db connection and init engine...")
     SQLModel.metadata.create_all(engine)
     logger.info("Created db connection...")

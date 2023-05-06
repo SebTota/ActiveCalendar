@@ -43,5 +43,10 @@ class UserCreate(UserBase):
     pass
 
 
-class UserRead(UserBase):
+class UserRead(SQLModel):
     id: str
+    first_name: str = Field(index=True, nullable=False)
+    last_name: str = Field(index=True, nullable=False)
+    email: str = Field(index=True, nullable=False, unique=True)
+    status: UserStatus = Field(nullable=False)
+    is_superuser: bool = Field(nullable=False, default=False)

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 class StravaCredentialsBase(SQLModel):
     access_token: str = Field(nullable=False)
     expires_at: datetime = Field(nullable=False)
-    refresh_token: datetime = Field(nullable=False)
+    refresh_token: str = Field(nullable=False)
     user_id: str = Field(foreign_key="user.id", nullable=False)
     user: "User" = Relationship(back_populates="strava_credentials")
 
