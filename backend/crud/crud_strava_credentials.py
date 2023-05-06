@@ -5,6 +5,13 @@ from sqlmodel import Session
 from backend.models import StravaCredentials, StravaCredentialsCreate
 
 
+def update(db: Session, obj: StravaCredentials) -> StravaCredentials:
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
 def get_by_user_id(db: Session, user_id: str) -> Optional[StravaCredentials]:
     return db.query(StravaCredentials).filter(StravaCredentials.user_id == user_id).first()
 

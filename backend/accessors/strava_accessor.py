@@ -1,19 +1,19 @@
 from datetime import datetime, timezone
 
 import pytz
+from sqlmodel import Session
 from stravalib.client import Client
 from stravalib.model import Athlete, Activity
 
-from backend import schemas, crud
+from backend import crud
 from backend.core import logger
 from backend.core.config import settings
-from backend.db.session import SessionLocal
 from backend.models import StravaCredentials
 
 
 class StravaAccessor:
-    def __init__(self, db: SessionLocal, strava_credentials: StravaCredentials):
-        self._db: SessionLocal = db
+    def __init__(self, db: Session, strava_credentials: StravaCredentials):
+        self._db: Session = db
         self._strava_credentials: StravaCredentials = strava_credentials
         self._init_strava_client()
 
@@ -44,15 +44,11 @@ class StravaAccessor:
             client_secret=settings.STRAVA_CLIENT_SECRET,
             refresh_token=self._strava_credentials.refresh_token)
 
-        update_strava_credentials: schemas.StravaCredentialsUpdate = schemas.StravaCredentialsUpdate(
-            access_token=refresh_response['access_token'],
-            refresh_token=refresh_response['refresh_token'],
-            expires_at=datetime.fromtimestamp(refresh_response['expires_at'], timezone.utc)
-        )
+        self._strava_credentials.access_token = refresh_response['access_token']
+        self._strava_credentials.refresh_token = refresh_response['refresh_token']
+        self._strava_credentials.expires_at = datetime.fromtimestamp(refresh_response['expires_at'], timezone.utc)
 
-        self._strava_credentials = crud.strava_credentials.update(db=self._db,
-                                                                  db_obj=self._strava_credentials,
-                                                                  obj_in=update_strava_credentials)
+        self._strava_credentials = crud.strava_credentials.update(db=self._db, obj=self._strava_credentials)
 
         logger.info(f"Updated strava user: {self._strava_credentials.user} expired credentials.")
 

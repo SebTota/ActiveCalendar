@@ -8,7 +8,7 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from backend.core import logger
 
-from backend import schemas, crud
+from backend import crud
 from backend.core.config import settings
 from backend.models import GoogleCalendarCredentials
 
@@ -49,11 +49,13 @@ class GoogleCalendarAccessor:
         if creds and creds.expiry < datetime.utcnow() + timedelta(minutes=15):
             logger.info(f"Refreshing Google credentials for user: {self._google_auth.user_id}.")
             creds.refresh(Request())
-            changes: schemas.GoogleAuthUpdate = schemas.GoogleAuthUpdate(token=creds.token,
-                                                                         expiry=creds.expiry,
-                                                                         refresh_token=creds.refresh_token,
-                                                                         scopes=creds.scopes)
-            self._google_auth = crud.google_calendar_auth.update(db=self._db, db_obj=self._google_auth, obj_in=changes)
+
+            self._google_auth.token = creds.token
+            self._google_auth.expiry = creds.expiry
+            self._google_auth.refresh_token = creds.refresh_token
+            self._google_auth.scopes = creds.scopes
+
+            self._google_auth = crud.google_calendar_auth.update(db=self._db, obj=self._google_auth)
 
     def _get_app_calendar_id(self, calendar_name) -> Union[str, None]:
         """

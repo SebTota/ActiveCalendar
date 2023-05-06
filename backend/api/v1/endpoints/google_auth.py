@@ -9,12 +9,12 @@ from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
-from backend import models, schemas, crud
+from backend import models, crud
 from backend.api import deps
 from backend.core import logger
 from backend.core.config import settings
 from backend.accessors.google_calendar_accessor import SCOPES as GOOGLE_CALENDAR_AUTH_SCOPES
-from backend.models import GoogleCalendarCredentials, GoogleCalendarCredentialsCreate
+from backend.models import GoogleCalendarCredentials, GoogleCalendarCredentialsCreate, Msg
 
 router = APIRouter()
 
@@ -100,7 +100,7 @@ def google_calendar_auth(current_user: models.User = Depends(deps.get_current_ac
     return RedirectResponse(authorization_url)
 
 
-@router.get('/calendar/callback', response_model=schemas.Msg)
+@router.get('/calendar/callback', response_model=Msg)
 def google_calendar_auth_callback(request: Request,
                                   state: str,
                                   db: Session = Depends(deps.get_db),
@@ -111,7 +111,7 @@ def google_calendar_auth_callback(request: Request,
             scopes=GOOGLE_CALENDAR_AUTH_SCOPES,
             state=state
         )
-        flow.redirect_uri = settings.GOOGLE_AUTH_CALLBACK_URL
+        flow.redirect_uri = settings.GOOGLE_CALENDAR_AUTH_CALLBACK_URL
 
         # Fix localhost testing
         authorization_response = 'https://' + str(request.url).replace('http://', '').replace('https://', '')
@@ -140,4 +140,4 @@ def google_calendar_auth_callback(request: Request,
 
     crud.google_calendar_auth.create(db=db, obj=google_auth_create)
 
-    return schemas.Msg(msg="Authenticated Google Calendar Auth")
+    return Msg(msg="Authenticated Google Calendar Auth")
