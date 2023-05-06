@@ -4,3 +4,4 @@ from .google_calendar_credentials import GoogleCalendarCredentials, GoogleCalend
 from .calendar_template import CalendarTemplate, CalendarTemplateCreate, CalendarTemplateType, CalendarTemplateStatus, CalendarTemplateRead
 from .calendar_event import CalendarEvent, CalendarEventCreate, CalendarEventRead
 from .auth_token import Token, TokenPayload
+from .msg import Msg
