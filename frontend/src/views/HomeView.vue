@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import HomePageHero from '../components/HomePageHero.vue'
+import Header from '../components/Header.vue'
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <HomePageHero />
   </main>
 </template>
