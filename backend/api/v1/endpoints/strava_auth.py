@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get('/auth')
-def strava_auth(current_user: models.User = Depends(deps.get_current_active_user)):
+def strava_auth():
     auth_url = Client().authorization_url(
         client_id=int(settings.STRAVA_CLIENT_ID),
         redirect_uri=settings.STRAVA_AUTH_CALLBACK_URL,

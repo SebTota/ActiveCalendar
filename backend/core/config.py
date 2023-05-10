@@ -6,8 +6,9 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = os.getenv('PROJECT_NAME')
     API_V1_STR: str = '/api/v1'
     API_HOST: str = f'http://localhost{API_V1_STR}'
+    UI_HOST: str = f'http://localhost'
     GOOGLE_CALENDAR_AUTH_CALLBACK_URL: str = f'{API_HOST}/google/calendar/callback'
-    GOOGLE_OAUTH_CALLBACK_URL: str = f'{API_HOST}/google/callback'
+    GOOGLE_OAUTH_CALLBACK_URL: str = f'{UI_HOST}/login'
     STRAVA_AUTH_CALLBACK_URL: str = f'{API_HOST}/strava/callback'
 
     SECRET_KEY: str = os.getenv('API_CREDENTIALS_GENERATOR_SECRET_KEY')

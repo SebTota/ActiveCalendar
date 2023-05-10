@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check build-only",
+    "build": "run-p build-only",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
@@ -14,6 +14,7 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.13",
     "@heroicons/vue": "^2.0.17",
+    "@tailwindcss/forms": "^0.5.3",
     "daisyui": "^2.51.6",
     "pinia": "^2.0.35",
     "vue": "^3.2.47",

@@ -29,8 +29,6 @@ services:
       - traefik.http.services.${STACK_NAME?Variable not set}-traefik-public.loadbalancer.server.port=80
 
   backend:
-    ports:
-      - "8888:8888"
     volumes:
       - ./backend:/backend
     environment:
@@ -45,6 +43,21 @@ services:
       - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
       - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
       - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
+
+
+  frontend:
+    volumes:
+      - ./frontend:/frontend
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
+      args:
+        FRONTEND_ENV: dev
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+      - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
+      - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=5173
 
 networks:
   traefik-public:

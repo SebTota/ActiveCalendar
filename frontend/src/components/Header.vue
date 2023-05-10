@@ -12,8 +12,8 @@
           </div>
           <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div class="flex flex-shrink-0 items-center">
-              <img class="block h-8 w-auto lg:hidden" src="/src/assets/ActiveRunWideLogo.png" alt="Active Run" />
-              <img class="hidden h-8 w-auto lg:block" src="/src/assets/ActiveRunWideLogo.png" alt="Active Run" />
+              <img class="block h-8 w-auto lg:hidden" src="../assets/ActiveRunWideLogo.png" alt="Active Run" />
+              <img class="hidden h-8 w-auto lg:block" src="../assets/ActiveRunWideLogo.png" alt="Active Run" />
             </div>
             <div class="hidden sm:ml-6 sm:block">
               <div class="flex space-x-4">
@@ -21,23 +21,10 @@
               </div>
             </div>
           </div>
-          <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">  
-            <!-- Profile dropdown -->
-            <Menu as="div" class="relative ml-3">
-              <div>
-                <MenuButton class="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                  <span class="sr-only">Open user menu</span>
-                  <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
-                </MenuButton>
+          <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"> 
+            <div class="flex space-x-4">
+                <a v-for="item in navigationRight" :key="item.name" :href="item.href" :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</a>
               </div>
-              <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                <MenuItems class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <MenuItem v-slot="{ active }">
-                    <a href="#" :class="[active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700']">Sign out</a>
-                  </MenuItem>
-                </MenuItems>
-              </transition>
-            </Menu>
           </div>
         </div>
       </div>
@@ -50,12 +37,23 @@
     </Disclosure>
   </template>
   
-  <script setup>
-  import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+  <script setup lang="ts">
+  import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
   import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
   
+  const pathname: string = window.location.pathname;
+  const homePath: string = "/";
+  const loginPath: string = "/login";
+  const settingsPath: string = "/settings";
+  const aboutPath: string = "/about";
+
   const navigation = [
-    { name: 'Home', href: '#', current: true },
-    { name: 'Calendar Templates', href: '#', current: false },
+    { name: 'Home', href: homePath, current: pathname === homePath },
+    { name: 'Settings', href: settingsPath, current: pathname === settingsPath },
+    { name: 'About', href: aboutPath, current: pathname === aboutPath },
+  ]
+
+  const navigationRight = [
+  { name: 'Login', href: loginPath, current: pathname === loginPath },
   ]
   </script>
