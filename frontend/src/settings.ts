@@ -1,0 +1,19 @@
+
+function getBackendRoute(): string {
+    const dev: boolean = true;
+
+    if (dev) {
+        return `http://localhost`;
+    } else {
+        return `https://${window.location.hostname}`;
+    }
+    
+}
+
+export const backendRouteBase: string = getBackendRoute();
+export const stravaAuthPath: string = `${backendRouteBase}/api/v1/strava/auth`;
+export const googleAuthPath: string = `${backendRouteBase}/api/v1/google/auth`;
+export const googleAuthCallback: string = `${backendRouteBase}/api/v1/google/callback`;
+export const googleSignCalaendarAuthPath: string = `${backendRouteBase}/api/v1/google/calendar/auth`;
+
+
