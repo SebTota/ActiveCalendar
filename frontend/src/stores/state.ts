@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import type { IToken } from '@/interfaces/token';
 import type { IUser } from '@/interfaces/user';
 import { api } from '@/api/api';
-import { removeLocalToken, saveLocalToken } from '@/utils/token';
+import {getLocalToken, isLoggedIn, removeLocalToken, saveLocalToken} from '@/utils/token';
 import router from '@/router';
 import {loginPath, settingsPath} from "@/settings";
 
@@ -15,8 +15,8 @@ export interface MainState {
 export const useMainStore = defineStore('mainState', {
     state: (): MainState => {
         return {
-            token: null,
-            isLoggedIn: false,
+            token: getLocalToken(),
+            isLoggedIn: isLoggedIn(),
             user: null
         }
     },

@@ -12,6 +12,10 @@ export const getLocalToken = (): IToken | null => {
     return null;
 }
 
+export const isLoggedIn = () : boolean => {
+    return getLocalToken() !== null;
+}
+
 export const saveLocalToken = (token: IToken) => {
     localStorage.setItem(LOCAL_STORAGE_NAME_AUTH_TOKEN, JSON.stringify(token));
 }
