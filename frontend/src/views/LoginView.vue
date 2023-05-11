@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { ref, type Ref } from "vue";
-import { googleAuthPath, googleAuthCallback } from '../settings';
+import { googleAuthPath } from '../settings';
 import { useMainStore } from "@/stores/state";
 
 const mainStore = useMainStore();
