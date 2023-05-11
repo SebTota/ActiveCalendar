@@ -31,16 +31,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, type Ref } from "vue";
 import { googleAuthPath, googleAuthCallback } from '../settings';
+import { useMainStore } from "@/stores/state";
 
-let showLoading: any = ref(true);
+const mainStore = useMainStore();
 
-const params: string = window.location.href.split(window.location.pathname)[1];
-if (params.includes("code=")) {
-    // window.location.href = `${googleAuthCallback}${params}`
-} else {
-    showLoading = false;
+let showLoading: Ref<boolean> = ref(true);
+let loginError: Ref<string> = ref("");
+
+async function handleAuthCheck() {
+    const params: string = window.location.href.split(window.location.pathname)[1];
+    console.log(params)
+    if (params.includes("state=")) {
+        try {
+            await mainStore.authenticateUserWithGoogle(params);
+        } catch (error) {
+            loginError.value = "Failed to authenticate with Google.";
+        }
+
+    } else {
+        showLoading.value = false;
+    }
 }
+handleAuthCheck();
 
 </script>

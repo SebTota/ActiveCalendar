@@ -43,7 +43,7 @@ async def google_user_auth():
 
 
 @router.get('/callback', response_model=Token)
-async def google_user_auth_callback(request: Request, state: str, db: Session = Depends(deps.get_db)):
+async def google_user_auth_callback(state: str, code: str, db: Session = Depends(deps.get_db)):
     try:
         flow: Flow = Flow.from_client_secrets_file(
             GOOGLE_CONFIG_PATH,
@@ -51,10 +51,7 @@ async def google_user_auth_callback(request: Request, state: str, db: Session = 
             state=state
         )
         flow.redirect_uri = settings.GOOGLE_OAUTH_CALLBACK_URL
-
-        # Fix localhost testing
-        authorization_response = 'https://' + str(request.url).replace('http://', '').replace('https://', '')
-        flow.fetch_token(authorization_response=authorization_response)
+        flow.fetch_token(code=code)
     except Exception as e:
         logger.error(f"Failed to authenticate user during Google auth request callback. {e}")
         # TODO Rather than raising an exception here, we need to redirect the user to the webapp and show an
@@ -129,8 +126,8 @@ def google_calendar_auth(current_user: models.User = Depends(deps.get_current_ac
 
 
 @router.get('/calendar/callback', response_model=Msg)
-def google_calendar_auth_callback(request: Request,
-                                  state: str,
+def google_calendar_auth_callback(state: str,
+                                  code: str,
                                   db: Session = Depends(deps.get_db),
                                   current_user: models.User = Depends(deps.get_current_active_user)):
     try:
@@ -140,10 +137,7 @@ def google_calendar_auth_callback(request: Request,
             state=state
         )
         flow.redirect_uri = settings.GOOGLE_CALENDAR_AUTH_CALLBACK_URL
-
-        # Fix localhost testing
-        authorization_response = 'https://' + str(request.url).replace('http://', '').replace('https://', '')
-        flow.fetch_token(authorization_response=authorization_response)
+        flow.fetch_token(code=code)
     except Exception as e:
         # TODO Rather than raising an exception here, we need to redirect the user to the webapp and show an
         #    error there.
