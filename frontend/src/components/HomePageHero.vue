@@ -1,7 +1,3 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
   <div class="hero min-h-screen bg-gray-800">
     <div class="hero-content flex-col lg:flex-row-reverse bg-gray-800">
@@ -13,8 +9,23 @@
         <p class="py-6">Track all your activities, right in your Google Calendar. Get per activity, daily, and weekly
           activity summaries to track your total mileage.
         </p>
-        <button class="btn btn-primary">Get Started</button>
+        <button class="btn btn-primary" @click="navigateGetStarted">Get Started</button>
       </div>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import {useMainStore} from "@/stores/state";
+
+const mainStore = useMainStore();
+
+function navigateGetStarted() {
+    if(mainStore.isLoggedIn) {
+        mainStore.redirectToSettings();
+    } else {
+        mainStore.redirectToLogin();
+    }
+}
+
+</script>

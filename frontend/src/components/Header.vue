@@ -54,7 +54,6 @@ import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/vue'
 import {Bars3Icon, XMarkIcon} from '@heroicons/vue/24/outline'
 import {aboutPath, homePath, loginPath, settingsPath} from "@/settings";
 import {useMainStore} from "@/stores/state";
-import {Ref, ref} from "vue";
 
 const mainStore = useMainStore();
 const pathname: string = window.location.pathname;
@@ -65,8 +64,6 @@ const navigation = [
     {name: 'About', href: aboutPath, current: pathname === aboutPath},
 ]
 
-console.log(mainStore.isLoggedIn);
-
 const navigationRight = [
     {name: 'Login', href: loginPath, current: pathname === loginPath, showButton: !mainStore.isLoggedIn, clickHandler: function() {}},
     {name: 'Sign Out', href: '', current: false, showButton: mainStore.isLoggedIn, clickHandler: signOut},
@@ -76,7 +73,6 @@ function signOut() {
     console.debug("Signing out...");
     mainStore.logout();
     mainStore.redirectToHomePage();
-    console.log(mainStore.isLoggedIn)
 }
 
 </script>
