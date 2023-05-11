@@ -1,3 +1,9 @@
+// UI Paths
+export const homePath: string = "/";
+export const loginPath: string = "/login";
+export const settingsPath: string = "/settings";
+export const aboutPath: string = "/about";
+
 
 function getBackendRoute(): string {
     const dev: boolean = true;

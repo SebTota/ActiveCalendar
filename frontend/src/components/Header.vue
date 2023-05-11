@@ -47,13 +47,9 @@
 <script setup lang="ts">
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
+import {aboutPath, homePath, loginPath, settingsPath} from "@/settings";
 
 const pathname: string = window.location.pathname;
-const homePath: string = "/";
-const loginPath: string = "/login";
-const settingsPath: string = "/settings";
-const aboutPath: string = "/about";
-
 const navigation = [
   { name: 'Home', href: homePath, current: pathname === homePath },
   { name: 'Settings', href: settingsPath, current: pathname === settingsPath },
