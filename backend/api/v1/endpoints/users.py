@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
-from backend import models
+from backend import models, crud
 from backend.api import deps
-from backend.models import UserRead
+from backend.models import MeMsg, UserRead
 
 router = APIRouter()
 
@@ -56,9 +56,14 @@ router = APIRouter()
 #     }
 
 
-@router.get("/me", response_model=UserRead)
+@router.get("/me", response_model=MeMsg)
 def get_user_me(db: Session = Depends(deps.get_db), current_user: models.User = Depends(deps.get_current_active_user)):
     """
     Get current signed-in user
     """
-    return current_user
+
+    return {
+        **current_user.dict(),
+        'hasStravaAuth': crud.strava_credentials.user_has_strava_credentials(db=db, user_id=current_user.id),
+        'hasGoogleCalendarAuth': crud.google_calendar_auth.user_has_google_calendar_auth(db=db, user_id=current_user.id)
+    }

@@ -6,3 +6,4 @@ from .calendar_event import CalendarEvent, CalendarEventCreate, CalendarEventRea
 from .auth_token import Token, TokenPayload
 from .msg import Msg
 from .strava_notification import StravaNotification, StravaNotificationType, StravaNotificationAction
+from .me import MeMsg

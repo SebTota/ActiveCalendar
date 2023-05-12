@@ -5,4 +5,6 @@ export interface IUser {
     email: string;
     status: string;
     is_superuser: boolean;
+    hasStravaAuth: boolean;
+    hasGoogleCalendarAuth: boolean;
 }

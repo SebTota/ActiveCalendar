@@ -6,6 +6,10 @@ from backend.models import GoogleCalendarCredentials, User, GoogleCalendarCreden
 from backend.utils.base_utils import get_random_alphanumeric_string
 
 
+def user_has_google_calendar_auth(db: Session, user_id: str) -> bool:
+    return db.query(GoogleCalendarCredentials).filter(User.id == user_id).first() is not None
+
+
 def get_for_user(db: Session, user_id: str) -> Optional[GoogleCalendarCredentials]:
     return db.query(GoogleCalendarCredentials).filter(User.id == user_id).first()
 

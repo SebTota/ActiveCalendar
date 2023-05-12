@@ -16,6 +16,10 @@ def update(db: Session, obj: StravaCredentials) -> StravaCredentials:
     return obj
 
 
+def user_has_strava_credentials(db: Session, user_id: str) -> bool:
+    return db.query(StravaCredentials).filter(StravaCredentials.user_id == user_id).first() is not None
+
+
 def get_by_user_id(db: Session, user_id: str) -> Optional[StravaCredentials]:
     return db.query(StravaCredentials).filter(StravaCredentials.user_id == user_id).first()
 
