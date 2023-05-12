@@ -18,17 +18,20 @@
                     </div>
                     <div class="hidden sm:ml-6 sm:block">
                         <div class="flex space-x-4">
-                            <router-link v-for="item in navigation" :key="item.name" :to="item.href"
-                                         :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
-                                         :aria-current="item.current ? 'page' : undefined">{{ item.name }}
-                            </router-link>
+                            <template v-for="item in navigation">
+                                <router-link :key="item.name" v-if="item.showButton" :to="item.href"
+                                             :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
+                                             :aria-current="item.current ? 'page' : undefined">{{ item.name }}
+                                </router-link>
+                            </template>
                         </div>
                     </div>
                 </div>
                 <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                     <div class="flex space-x-4">
                         <template v-for="item in navigationRight">
-                            <router-link :key="item.name" v-if="item.showButton" :to="item.href" @click="item.clickHandler()"
+                            <router-link :key="item.name" v-if="item.showButton" :to="item.href"
+                                         @click="item.clickHandler()"
                                          :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
                                          :aria-current="item.current ? 'page' : undefined">{{ item.name }}
                             </router-link>
@@ -59,9 +62,9 @@ const mainStore = useMainStore();
 const pathname: string = window.location.pathname;
 
 const navigation = [
-    {name: 'Home', href: homePath, current: pathname === homePath},
-    {name: 'Settings', href: settingsPath, current: pathname === settingsPath},
-    {name: 'About', href: aboutPath, current: pathname === aboutPath},
+    {name: 'Home', href: homePath, current: pathname === homePath, showButton: true},
+    {name: 'Settings', href: settingsPath, current: pathname === settingsPath, showButton: mainStore.isLoggedIn},
+    {name: 'About', href: aboutPath, current: pathname === aboutPath, showButton: true}
 ]
 
 const navigationRight = [
