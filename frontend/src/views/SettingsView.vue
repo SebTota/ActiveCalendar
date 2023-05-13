@@ -1,18 +1,8 @@
 <template>
     <template v-if="showLoading">
-        <div class="py-6">
-            <div class="flex justify-center items-center">
-                <div class="flex items-center justify-center">
-                    <div
-                            class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-white to-gray-600 animate-spin">
-                        <div class="h-9 w-9 rounded-full bg-gray-700"></div>
-                    </div>
-                </div>
-            </div>
-            <h2 class="text-center text-l font-bold leading-9 tracking-tight text-gray-300">Loading...</h2>
-        </div>
+        <LoadingSpinner/>
     </template>
-    <template v-else>
+    <template v-else :key="currentNavigation">
         <div class="flex h-full mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 py-6">
             <div class="w-1/3 h-full border-r-2 border-gray-700">
                 <nav class="py-4 px-4" aria-label="Sidebar">
@@ -54,18 +44,20 @@ import type {IUser} from '@/interfaces/user';
 import {useMainStore} from "@/stores/state";
 import {Ref, ref} from "vue";
 import {googleCalendarAuthPath, stravaAuthPath} from "@/settings";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 const store = useMainStore();
 
 const showLoading: Ref<boolean> = ref(true);
 const error: Ref<string> = ref('');
 const user: Ref<IUser | null> = ref(null);
+const currentNavigation: Ref<string> = ref(window.location.hash || '#account');
 
 const navigation = [
-    {name: 'Account', href: '#', current: true},
-    {name: 'Activity Template', href: '#', current: false},
-    {name: 'Daily Template', href: '#', current: false},
-    {name: 'Weekly Template', href: '#', current: false}
+    {name: 'Account', href: '#account', current: currentNavigation.value === '#account'},
+    {name: 'Activity Template', href: '#activityTemplate', current: currentNavigation.value === '#activityTemplate'},
+    {name: 'Daily Template', href: '#dailyTemplate', current: currentNavigation.value === '#dailyTemplate'},
+    {name: 'Weekly Template', href: '#weeklyTemplate', current: currentNavigation.value === '#weeklyTemplate'},
 ]
 
 store.getMe().then((userInfo: IUser) => {
