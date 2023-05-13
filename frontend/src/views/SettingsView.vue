@@ -2,8 +2,9 @@
     <template v-if="showLoading">
         <LoadingSpinner/>
     </template>
-    <template v-else :key="currentNavigation">
+    <template v-else>
         <div class="flex h-full mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 py-6">
+            <!--This is the navigation bar-->
             <div class="w-1/3 h-full border-r-2 border-gray-700">
                 <nav class="py-4 px-4" aria-label="Sidebar">
                     <a v-for="item in navigation" :key="item.name" :href="item.href"
@@ -13,29 +14,13 @@
                     </a>
                 </nav>
             </div>
+            <!--This is the content-->
+            <div class="w-2/3 h-full">
+                <StravaAndCalendarAuth user="user"/>
+            </div>
         </div>
     </template>
 
-
-  <!--    <template v-else-if="user && (!user.hasGoogleCalendarAuth || !user.hasStravaAuth)">-->
-  <!--        <div class="flex flex-1 flex-col justify-center px-6 py-12 lg:px-8">-->
-  <!--            <div class="md:mx-auto sm:w-full sm:max-w-3xl">-->
-  <!--                <p class="text-center text-base text-gray-300">-->
-  <!--                    Sign in to your Strava and Google Calendar account below to start creating your calendar templates.-->
-  <!--                </p>-->
-  <!--            </div>-->
-  <!--            <div v-if="user && user.hasGoogleCalendarAuth" class="text-center mt-6">-->
-  <!--                <a :href="googleCalendarAuthPath">-->
-  <!--                    <img src="../assets/google_sign_in.png" class="inline" alt="Google sign in button"/>-->
-  <!--                </a>-->
-  <!--            </div>-->
-  <!--            <div v-if="user && !user.hasStravaAuth" class="text-center mt-6">-->
-  <!--                <a :href="stravaAuthPath">-->
-  <!--                    <img src="../assets/btn_strava_connectwith_light.png" class="inline" alt="Strava sign in button"/>-->
-  <!--                </a>-->
-  <!--            </div>-->
-  <!--        </div>-->
-  <!--    </template>-->
 </template>
 
 <script setup lang="ts">
@@ -43,8 +28,8 @@ import type {IUser} from '@/interfaces/user';
 
 import {useMainStore} from "@/stores/state";
 import {Ref, ref} from "vue";
-import {googleCalendarAuthPath, stravaAuthPath} from "@/settings";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import StravaAndCalendarAuth from "@/components/StravaAndCalendarAuth.vue";
 
 const store = useMainStore();
 
