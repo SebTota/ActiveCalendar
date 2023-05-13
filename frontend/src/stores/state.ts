@@ -57,6 +57,7 @@ export const useMainStore = defineStore('mainState', {
                     this.user = user;
                     return this.user;
                 } else {
+                    console.debug("Failed to retrieve user info. Signing user out.");
                     this.logout();
                     this.redirectToLogin();
                 }
@@ -66,7 +67,7 @@ export const useMainStore = defineStore('mainState', {
             }
         },
         hasValidAccessToken() {
-            return this.token && this.token.access_token_expires > new Date();
+            return this.token && this.token.access_token_expires.getTime() > new Date().getTime();
         },
         logout() {
             this.removeLogin();
