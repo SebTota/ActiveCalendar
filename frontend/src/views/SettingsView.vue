@@ -15,8 +15,8 @@
                 </nav>
             </div>
             <!--This is the content-->
-            <div class="w-2/3 h-full">
-                <StravaAndCalendarAuth user="user"/>
+            <div class="w-2/3 h-full" v-if="user">
+                <StravaAndCalendarAuth :user="user"/>
             </div>
         </div>
     </template>

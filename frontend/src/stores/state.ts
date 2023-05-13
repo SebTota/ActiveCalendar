@@ -1,10 +1,11 @@
-import { defineStore } from 'pinia'
-import type { IToken } from '@/interfaces/token';
-import type { IUser } from '@/interfaces/user';
-import { api } from '@/api/api';
+import {defineStore} from 'pinia'
+import type {IToken} from '@/interfaces/token';
+import type {IUser} from '@/interfaces/user';
+import {api} from '@/api/api';
 import {getLocalToken, isLoggedIn, removeLocalToken, saveLocalToken} from '@/utils/token';
 import router from '@/router';
 import {loginPath, settingsPath} from "@/settings";
+import type {IMsg} from "@/interfaces/msg";
 
 export interface MainState {
     token: IToken | null;
@@ -41,6 +42,44 @@ export const useMainStore = defineStore('mainState', {
                 throw new Error("Failed to authenticate user with Google.");
             }
 
+        },
+        async authenticateUserWithGoogleCalendar(state: string, code: string) {
+            if (!this.isLoggedIn || !this.hasValidAccessToken()) {
+                console.debug("User tried to retrieve user info but is not logged in or access token is expired.");
+                this.logout();
+                this.redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await api.googleCalendarAuthCallback(this.token!.access_token, state, code);
+                const data: IMsg = response.data;
+                if (data && data.msg === "Authenticated") {
+                    this.redirectToSettings();
+                } else {
+                    throw new Error("Failed to authenticate user with Google Calendar.");
+                }
+            } catch (error) {
+                console.error("Failed to authenticate user with Google Calendar.", error);
+                this.logout();
+                throw new Error("Failed to authenticate user with Google Calendar.");
+            }
+        },
+        async authenticateUserWithStrava(code: string) {
+            if (!this.isLoggedIn || !this.hasValidAccessToken()) {
+                console.debug("User tried to retrieve user info but is not logged in or access token is expired.");
+                this.logout();
+                this.redirectToLogin();
+                return;
+            }
+
+            const response = await api.stravaAuthCallback(this.token!.access_token, code);
+            const data: IMsg = response.data;
+            if (data && data.msg === "Authenticated") {
+                this.redirectToSettings();
+            } else {
+                throw new Error("Failed to authenticate user with Strava.");
+            }
         },
         async getMe() {
             if (!this.isLoggedIn || !this.hasValidAccessToken()) {

@@ -54,8 +54,6 @@ async def google_user_auth_callback(state: str, code: str, db: Session = Depends
         flow.fetch_token(code=code)
     except Exception as e:
         logger.error(f"Failed to authenticate user during Google auth request callback. {e}")
-        # TODO Rather than raising an exception here, we need to redirect the user to the webapp and show an
-        #    error there.
         raise HTTPException(status_code=403, detail="Failed to authenticate user during Google auth request callback.")
 
     google_credentials = flow.credentials
@@ -70,7 +68,6 @@ async def google_user_auth_callback(state: str, code: str, db: Session = Depends
     google_name: str = user_id_token['name']
     google_user_id: str = user_id_token['sub']
 
-    # TODO Rather than raising an exception here, we need to redirect the user to the home page and show an error there.
     if not is_verified:
         raise HTTPException(status_code=400, detail="Please use a verified Google account to sign in.")
 
@@ -97,13 +94,11 @@ async def google_user_auth_callback(state: str, code: str, db: Session = Depends
         # User sign in
         if user.auth_provider != AuthProvider.GOOGLE:
             logger.info(f"User: {user.id} tried to sign in with Google, but has an account with another provider.")
-            # TODO: This should be redirecting to the homepage
             raise HTTPException(status_code=400,
                                 detail="An account with this email already exists with a different provider.")
 
         if user.auth_provider_id != google_user_id:
             logger.error("User signed in with Google and the emails match, but 'sub' value is different.")
-            # TODO: This should be redirecting to the homepage
             raise HTTPException(status_code=400,
                                 detail="Failed to validate Google account.")
 
@@ -111,7 +106,7 @@ async def google_user_auth_callback(state: str, code: str, db: Session = Depends
 
 
 @router.get('/calendar/auth')
-def google_calendar_auth(current_user: models.User = Depends(deps.get_current_active_user)):
+def google_calendar_auth():
     flow = Flow.from_client_secrets_file(
         GOOGLE_CONFIG_PATH,
         scopes=GOOGLE_CALENDAR_AUTH_SCOPES)
@@ -139,8 +134,6 @@ def google_calendar_auth_callback(state: str,
         flow.redirect_uri = settings.GOOGLE_CALENDAR_AUTH_CALLBACK_URL
         flow.fetch_token(code=code)
     except Exception as e:
-        # TODO Rather than raising an exception here, we need to redirect the user to the webapp and show an
-        #    error there.
         logger.error(f"Failed to authenticate user during Google Calendar auth request callback. {e}")
         raise HTTPException(status_code=403, detail="Failed to authenticate user during Google Calendar auth request callback.")
 
@@ -160,6 +153,4 @@ def google_calendar_auth_callback(state: str,
     )
 
     crud.google_calendar_auth.create(db=db, obj=google_auth_create)
-
-    # TODO: This should be redirecting to the home page rather than returning a response
-    return Msg(msg="Authenticated Google Calendar Auth")
+    return Msg(msg="Authenticated")

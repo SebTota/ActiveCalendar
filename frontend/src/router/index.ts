@@ -22,6 +22,16 @@ const router = createRouter({
             component: SettingsView
         },
         {
+            path: '/strava/callback',
+            name: 'strava-callback',
+            component: () => import('../views/callbackHandlers/StravaAuthCallbackHandlerView.vue')
+        },
+        {
+            path: '/google/calendar/callback',
+            name: 'google-calendar-callback',
+            component: () => import('../views/callbackHandlers/GoogleCalendarAuthCallbackHandlerView.vue')
+        },
+        {
             path: '/about',
             name: 'about',
             component: () => import('../views/AboutView.vue')

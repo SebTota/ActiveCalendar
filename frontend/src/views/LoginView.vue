@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { ref, type Ref } from "vue";
-import { googleAuthPath } from '../settings';
+import { googleAuthPath } from '@/settings';
 import { useMainStore } from "@/stores/state";
 
 const mainStore = useMainStore();
@@ -42,7 +42,6 @@ let loginError: Ref<string> = ref("");
 
 async function handleAuthCheck() {
     const params: string = window.location.href.split(window.location.pathname)[1];
-    console.log(params)
     if (params.includes("state=")) {
         try {
             await mainStore.authenticateUserWithGoogle(params);

@@ -51,6 +51,8 @@ def strava_auth_callback(code: str,
         raise HTTPException(status_code=500,
                             detail='Failed to retrieve athlete details during authentication.')
 
+    # TODO: Delete old auth credentials for this user if they exist
+
     strava_credentials: StravaCredentialsCreate = StravaCredentialsCreate(access_token=access_token,
                                                                           expires_at=expires_at,
                                                                           refresh_token=refresh_token,
