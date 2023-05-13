@@ -42,6 +42,32 @@ export const useMainStore = defineStore('mainState', {
             }
 
         },
+        async getMe() {
+            if (!this.isLoggedIn || !this.hasValidAccessToken()) {
+                console.debug("User tried to retrieve user info but is not logged in or access token is expired.");
+                this.logout();
+                this.redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await api.getMe(this.token!.access_token);
+                const user: IUser = response.data;
+                if (user) {
+                    this.user = user;
+                    return this.user;
+                } else {
+                    this.logout();
+                    this.redirectToLogin();
+                }
+            } catch (error) {
+                console.error("Failed to retrieve user info.", error);
+                throw new Error("Failed to retrieve user info.");
+            }
+        },
+        hasValidAccessToken() {
+            return this.token && this.token.access_token_expires > new Date();
+        },
         logout() {
             this.removeLogin();
         },
