@@ -8,14 +8,14 @@
             <div class="w-1/3 h-full border-r-2 border-gray-700">
                 <nav class="py-4 px-4" aria-label="Sidebar">
                     <a v-for="item in navigation" :key="item.name" :href="item.href"
-                       :class="[item.current ? 'bg-gray-900 text-gray-300' : 'text-gray-400 hover:bg-gray-700 hover:text-white', 'group flex items-center px-3 py-2 text-sm font-medium rounded-md']"
-                       :aria-current="item.current ? 'page' : undefined">
+                       :class="[currentNavigation === item.href ? 'bg-gray-900 text-gray-300' : 'text-gray-400 hover:bg-gray-700 hover:text-white', 'group flex items-center px-3 py-2 text-sm font-medium rounded-md']"
+                       :aria-current="currentNavigation === item.href ? 'page' : undefined">
                         <span class="truncate">{{ item.name }}</span>
                     </a>
                 </nav>
             </div>
             <!--This is the content-->
-            <div class="w-2/3 h-full" v-if="user">
+            <div class="w-2/3 h-full" v-if="user && currentNavigation === '#account'">
                 <StravaAndCalendarAuth :user="user"/>
             </div>
         </div>
@@ -39,11 +39,15 @@ const user: Ref<IUser | null> = ref(null);
 const currentNavigation: Ref<string> = ref(window.location.hash || '#account');
 
 const navigation = [
-    {name: 'Account', href: '#account', current: currentNavigation.value === '#account'},
-    {name: 'Activity Template', href: '#activityTemplate', current: currentNavigation.value === '#activityTemplate'},
-    {name: 'Daily Template', href: '#dailyTemplate', current: currentNavigation.value === '#dailyTemplate'},
-    {name: 'Weekly Template', href: '#weeklyTemplate', current: currentNavigation.value === '#weeklyTemplate'},
+    {name: 'Account', href: '#account'},
+    {name: 'Activity Template', href: '#activityTemplate'},
+    {name: 'Daily Template', href: '#dailyTemplate'},
+    {name: 'Weekly Template', href: '#weeklyTemplate'},
 ]
+
+onhashchange = (event) => {
+    currentNavigation.value = window.location.hash;
+};
 
 store.getMe().then((userInfo: IUser) => {
     user.value = userInfo;
