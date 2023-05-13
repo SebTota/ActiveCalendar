@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="h-full">
     <HomePageHero />
   </main>
 </template>
