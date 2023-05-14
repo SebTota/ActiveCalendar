@@ -19,11 +19,11 @@
                 <div class="flex flex-1 flex-col justify-center px-6 py-4 lg:px-8">
                     <StravaAndCalendarAuth :user="user" v-if="user && currentNavigation === '#account'"/>
                     <TemplateBuilder v-if="user && currentNavigation === '#activityTemplate'"
-                                     title="Activity Template" :user="user"/>
+                                     :template-type="CalendarTemplateType.ACTIVITY_SUMMARY"/>
                     <TemplateBuilder v-if="user && currentNavigation === '#dailyTemplate'"
-                                     title="Daily Template" :user="user"/>
+                                     :template-type="CalendarTemplateType.DAILY_SUMMARY"/>
                     <TemplateBuilder v-if="user && currentNavigation === '#weeklyTemplate'"
-                                     title="Weekly Template" :user="user"/>
+                                     :template-type="CalendarTemplateType.WEEKLY_SUMMARY"/>
                 </div>
             </div>
         </div>
@@ -39,6 +39,7 @@ import {Ref, ref} from "vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import StravaAndCalendarAuth from "@/components/StravaAndCalendarAuth.vue";
 import TemplateBuilder from "@/components/TemplateBuilder.vue";
+import {CalendarTemplateType} from "@/enums/CalendarTemplateType";
 
 const store = useMainStore();
 

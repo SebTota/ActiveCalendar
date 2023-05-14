@@ -1,0 +1,6 @@
+
+export const enum CalendarTemplateType {
+    ACTIVITY_SUMMARY = 'ACTIVITY_SUMMARY',
+    DAILY_SUMMARY = 'DAILY_SUMMARY',
+    WEEKLY_SUMMARY = 'WEEKLY_SUMMARY'
+}

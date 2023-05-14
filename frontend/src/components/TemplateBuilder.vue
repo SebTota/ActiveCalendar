@@ -26,9 +26,24 @@
 
 <script setup lang="ts">
 
+import {computed} from "vue";
+import {CalendarTemplateType} from "@/enums/CalendarTemplateType";
+
 const props = defineProps<{
-    title: string
+    templateType: CalendarTemplateType
 }>()
 
+const title = computed(() => {
+    switch (props.templateType) {
+        case CalendarTemplateType.ACTIVITY_SUMMARY:
+            return 'Activity Template'
+        case CalendarTemplateType.DAILY_SUMMARY:
+            return 'Daily Summary Template'
+        case CalendarTemplateType.WEEKLY_SUMMARY:
+            return 'Weekly Summary Template'
+        default:
+            return 'Calendar Template'
+    }
+})
 
 </script>
