@@ -35,8 +35,12 @@ class CalendarTemplateCreate(CalendarTemplateBase):
     pass
 
 
-class CalendarTemplateRead(CalendarTemplateBase):
+class CalendarTemplateRead(SQLModel):
     id: str
+    status: CalendarTemplateStatus
+    type: CalendarTemplateType
+    title_template: str
+    body_template: str
 
 
 class CalendarTemplateUpdate(SQLModel):

@@ -6,13 +6,14 @@ from sqlmodel import Session
 from backend import models, crud
 from backend.api import deps
 from backend.core import logger
-from backend.models import CalendarTemplateCreate, CalendarTemplate, User, CalendarTemplateUpdate, CalendarTemplateType
+from backend.models import CalendarTemplateCreate, CalendarTemplate, User, CalendarTemplateUpdate, CalendarTemplateType, \
+    CalendarTemplateRead
 from backend.utils import calendar_template_utils
 
 router = APIRouter()
 
 
-@router.get('/', response_model=CalendarTemplate)
+@router.get('/', response_model=CalendarTemplateRead)
 def get_calendar_template_by_type(template_type: CalendarTemplateType,
                                   db: Session = Depends(deps.get_db),
                                   current_user: User = Depends(deps.get_current_active_user)):
@@ -24,7 +25,7 @@ def get_calendar_template_by_type(template_type: CalendarTemplateType,
     return template
 
 
-@router.post('/', response_model=CalendarTemplate)
+@router.post('/', response_model=CalendarTemplateRead)
 def create_new_calendar_template(calendar_template: CalendarTemplateCreate,
                                  db: Session = Depends(deps.get_db),
                                  current_user: User = Depends(deps.get_current_active_user)):
@@ -44,7 +45,7 @@ def create_new_calendar_template(calendar_template: CalendarTemplateCreate,
     return template
 
 
-@router.post('/{id}', response_model=CalendarTemplate)
+@router.post('/{id}', response_model=CalendarTemplateRead)
 def update_calendar_template(template_updates: CalendarTemplateUpdate,
                              id: str,
                              db: Session = Depends(deps.get_db),
