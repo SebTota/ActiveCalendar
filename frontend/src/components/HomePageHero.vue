@@ -1,7 +1,7 @@
 <template>
-  <div class="hero h-full bg-gray-800">
-    <div class="hero-content h-full flex-col lg:flex-row-reverse bg-gray-800">
-      <div class="bg-gray-800">
+  <div class="hero h-full">
+    <div class="hero-content h-full flex-col lg:flex-row-reverse">
+      <div>
         <img src="/src/assets/mock_one.png" alt="Phone mock with calendar view" class="max-w-100 sm:max-w-sm rounded-lg shadow-2xl" />
       </div>
       <div>
