@@ -6,10 +6,22 @@ from sqlmodel import Session
 from backend import models, crud
 from backend.api import deps
 from backend.core import logger
-from backend.models import CalendarTemplateCreate, CalendarTemplate, User, CalendarTemplateUpdate
+from backend.models import CalendarTemplateCreate, CalendarTemplate, User, CalendarTemplateUpdate, CalendarTemplateType
 from backend.utils import calendar_template_utils
 
 router = APIRouter()
+
+
+@router.get('/', response_model=CalendarTemplate)
+def get_calendar_template_by_type(template_type: CalendarTemplateType,
+                                  db: Session = Depends(deps.get_db),
+                                  current_user: User = Depends(deps.get_current_active_user)):
+    template: Optional[CalendarTemplate] = crud.calendar_template.get_template_by_type(db, current_user.id,
+                                                                                       template_type)
+    if template is None:
+        raise HTTPException(status_code=404, detail="Template not found.")
+
+    return template
 
 
 @router.post('/', response_model=CalendarTemplate)
@@ -37,7 +49,7 @@ def update_calendar_template(template_updates: CalendarTemplateUpdate,
                              id: str,
                              db: Session = Depends(deps.get_db),
                              current_user: models.User = Depends(deps.get_current_active_user)):
-    existing_template: Optional[models.CalendarTemplate] = crud.calendar_template.get(db=db, id=id)
+    existing_template: Optional[models.CalendarTemplate] = crud.calendar_template.get(db, id)
 
     if existing_template is None:
         raise HTTPException(status_code=400, detail="Invalid template id.")
