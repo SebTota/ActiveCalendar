@@ -36,7 +36,7 @@ const store = useMainStore();
 const showLoading: Ref<boolean> = ref(true);
 const error: Ref<string> = ref('');
 const user: Ref<IUser | null> = ref(null);
-const currentNavigation: Ref<string> = ref(window.location.hash || '#account');
+const currentNavigation: Ref<string> = ref(window.location.hash !== '' ? window.location.hash : '#account');
 
 const navigation = [
     {name: 'Account', href: '#account'},
@@ -51,8 +51,10 @@ onhashchange = (event) => {
 
 store.getMe().then((userInfo: IUser) => {
     user.value = userInfo;
+    if (userInfo.hasStravaAuth && userInfo.hasGoogleCalendarAuth) {
+        currentNavigation.value = '#activityTemplate';
+    }
     showLoading.value = false;
-    console.log(user.value);
 }).catch((err: Error) => {
     console.log(err);
     error.value = err.message;
