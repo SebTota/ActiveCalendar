@@ -1,6 +1,6 @@
 <template>
     <div class="pb-5 border-b border-gray-200">
-        <h3 class="text-lg leading-6 font-semibold text-gray-300">Account</h3>
+        <h3 class="text-lg leading-6 font-bold text-gray-300">Account</h3>
         <p class="mt-2 max-w-4xl text-sm text-gray-300">Sign in with your Strava and Google calendar accounts below
             to
             start syncing your activities.</p>

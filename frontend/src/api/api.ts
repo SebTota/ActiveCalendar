@@ -3,6 +3,8 @@ import type { IUser } from "@/interfaces/user";
 import { backendRouteBase } from "@/settings";
 import axios from "axios";
 import type {IMsg} from "@/interfaces/msg";
+import type {CalendarTemplateType} from "@/enums/CalendarTemplateType";
+import type {ICalendarTemplate} from "@/interfaces/calendarTemplate";
 
 const client = axios.create({ baseURL: backendRouteBase });
 
@@ -36,5 +38,17 @@ export const api = {
     async getMe(token: string) {
         return client.get<IUser>(`${backendRouteBase}/api/v1/users/me`, authHeaders(token));
     },
+
+    async getCalendarTemplate(token: string, type: CalendarTemplateType) {
+        const pack: any = authHeaders(token);
+        pack['params'] = {
+            template_type: type.toString()
+        };
+        return client.get<ICalendarTemplate>(`${backendRouteBase}/api/v1/calendar_template`, pack);
+    },
+
+    async updateCalendarTemplate(token: string, id: string, template: ICalendarTemplate) {
+        return client.post<ICalendarTemplate>(`${backendRouteBase}/api/v1/calendar_template/${id}`, template, authHeaders(token));
+    }
     
 }
