@@ -20,7 +20,7 @@
                         <div class="flex space-x-4">
                             <template v-for="item in navigation">
                                 <router-link :key="item.name" v-if="item.showButton" :to="item.href"
-                                             :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
+                                             :class="[item.current ? 'text-white underline' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
                                              :aria-current="item.current ? 'page' : undefined">{{ item.name }}
                                 </router-link>
                             </template>
@@ -32,7 +32,7 @@
                         <template v-for="item in navigationRight">
                             <router-link :key="item.name" v-if="item.showButton" :to="item.href"
                                          @click="item.clickHandler()"
-                                         :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
+                                         :class="[item.current ? 'text-white underline' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
                                          :aria-current="item.current ? 'page' : undefined">{{ item.name }}
                             </router-link>
                         </template>
@@ -44,7 +44,7 @@
         <DisclosurePanel class="sm:hidden">
             <div class="space-y-1 px-2 pb-3 pt-2">
                 <DisclosureButton v-for="item in navigation" :key="item.name" as="a" :href="item.href"
-                                  :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block rounded-md px-3 py-2 text-base font-medium']"
+                                  :class="[item.current ? 'text-white underline' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block rounded-md px-3 py-2 text-base font-medium']"
                                   :aria-current="item.current ? 'page' : undefined">{{ item.name }}
                 </DisclosureButton>
             </div>

@@ -11,6 +11,7 @@
             <h3 class="text-md leading-6 font-semibold text-gray-300 pb-2">Title</h3>
             <input type="text" name="calendarTemplateTitle" id="calendarTemplateTitle"
                    :value="calendarTemplate.title_template"
+                   :disabled="isTemplateDisabled()"
                    class="block w-full py-2 resize-none bg-gray-800 text-gray-200 focus:ring-0 border border-gray-300 rounded-md text-sm font-medium"/>
             <h3 class="text-md leading-6 font-medium text-gray-300 pt-4 pb-2">Calendar Event</h3>
             <div class="min-w-0 flex-1 relative">
@@ -18,6 +19,7 @@
                     <label for="calendarEventTemplate" class="sr-only"></label>
                     <textarea rows="10" name="calendarEventTemplate" id="calendarEventTemplate"
                               :value="calendarTemplate.body_template"
+                              :disabled="isTemplateDisabled()"
                               class="block w-full py-3 border-0 text-gray-200 bg-gray-800 focus:ring-0 text-sm font-medium"/>
                 </div>
             </div>
@@ -25,12 +27,12 @@
         <div v-if="errorMessage" class="mt-3 p-3 rounded-lg shadow-sm border-4 border-red-600">
             <p class="text-md font-semibold text-red-600">{{ errorMessage }}</p>
         </div>
-        <div class="mt-6 flex items-center justify-end gap-x-6">
-            <button @click="loadTemplates"
-                    class="rounded-md bg-yellow-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500">
-                Reset Changes
-            </button>
-            <template v-if="calendarTemplate.status === CalendarTemplateStatus.ACTIVE">
+        <div class="mt-6 flex items-center justify-end gap-x-4">
+            <template v-if="!isTemplateDisabled()">
+                <button @click="loadTemplates"
+                        class="rounded-md bg-yellow-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500">
+                    Reset Changes
+                </button>
                 <button @click="disableTemplate"
                         class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
                     Disable
@@ -92,6 +94,10 @@ function loadTemplates() {
         errorMessage.value = error.message;
         isLoading.value = false;
     });
+}
+
+function isTemplateDisabled(): boolean {
+    return calendarTemplate.value!.status === CalendarTemplateStatus.DISABLED;
 }
 
 function enableTemplate() {

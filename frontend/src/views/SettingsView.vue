@@ -3,19 +3,31 @@
         <LoadingSpinner/>
     </template>
     <template v-else>
-        <div class="flex h-full mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 py-6">
-            <!--This is the navigation bar-->
-            <div class="w-1/3 h-full border-r-2 border-gray-700">
+        <div class="flex flex-col sm:flex-row h-full mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 py-6">
+            <!--This is the navigation bar on desktop-->
+            <div class="w-1/3 h-full border-r-2 border-gray-700 hidden sm:inline">
                 <nav class="py-4 px-4" aria-label="Sidebar">
                     <a v-for="item in navigation" :key="item.name" :href="item.href"
-                       :class="[currentNavigation === item.href ? 'bg-gray-900 text-gray-300' : 'text-gray-400 hover:bg-gray-700 hover:text-white', 'group flex items-center px-3 py-2 text-sm font-medium rounded-md']"
+                       :class="[currentNavigation === item.href ? 'text-white underline' : 'text-gray-400 hover:bg-gray-700 hover:text-white', 'group flex items-center px-3 py-2 text-sm font-medium rounded-md']"
                        :aria-current="currentNavigation === item.href ? 'page' : undefined">
                         <span class="truncate">{{ item.name }}</span>
                     </a>
                 </nav>
             </div>
+
+            <!--This is the navigation bar on mobile-->
+            <div class="w-full flex-1 flex-col border-b-2 border-gray-700 inline sm:hidden">
+                <nav class="py-2 px-4 overflow-auto whitespace-nowrap" aria-label="Sidebar">
+                    <a v-for="item in navigation" :key="item.name" :href="item.href"
+                       :class="[currentNavigation === item.href ? 'text-white underline' : 'text-gray-400 hover:bg-gray-700 hover:text-white', 'group inline-block px-3 py-2 text-sm font-medium rounded-md']"
+                       :aria-current="currentNavigation === item.href ? 'page' : undefined">
+                        <span class="truncate">{{ item.name }}</span>
+                    </a>
+                </nav>
+            </div>
+
             <!--This is the content-->
-            <div class="w-2/3 h-full">
+            <div class="w-full h-full">
                 <div class="flex flex-1 flex-col justify-center px-6 py-4 lg:px-8">
                     <StravaAndCalendarAuth :user="user" v-if="user && currentNavigation === '#account'"/>
                     <TemplateBuilder v-if="user && currentNavigation === '#activityTemplate'"
@@ -40,6 +52,7 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import StravaAndCalendarAuth from "@/components/StravaAndCalendarAuth.vue";
 import TemplateBuilder from "@/components/TemplateBuilder.vue";
 import {CalendarTemplateType} from "@/enums/CalendarTemplateType";
+import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/vue";
 
 const store = useMainStore();
 
