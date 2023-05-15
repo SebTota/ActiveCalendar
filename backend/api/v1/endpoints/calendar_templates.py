@@ -19,6 +19,9 @@ def get_calendar_template_by_type(template_type: CalendarTemplateType,
                                   current_user: User = Depends(deps.get_current_active_user)):
     template: Optional[CalendarTemplate] = crud.calendar_template.get_template_by_type(db, current_user.id,
                                                                                        template_type)
+
+    # TODO: Create a default template if one does not exist. It should already exist on user signup,
+    #  but if it doesn't, we should create it here.
     if template is None:
         raise HTTPException(status_code=404, detail="Template not found.")
 
@@ -73,7 +76,7 @@ def _validate_template(template) -> [Optional[str]]:
         invalid_body_keys = calendar_template_utils.verify_template(template.body_template, template.type)
 
     if invalid_title_keys or invalid_body_keys:
-        errs: [str] = ["Failed to create new calendar template."]
+        errs: [str] = []
         errs.append(f"Invalid title keys: {', '.join(invalid_title_keys)}.") if invalid_title_keys else None
         errs.append(f"Invalid calendar template keys: {', '.join(invalid_body_keys)}.") if invalid_body_keys else None
         raise HTTPException(status_code=400, detail=" ".join(errs))

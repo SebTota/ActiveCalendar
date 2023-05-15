@@ -86,10 +86,13 @@ async def google_user_auth_callback(state: str, code: str, db: Session = Depends
                                           auth_provider_id=google_user_id,
                                           status=UserStatus.ACTIVE)
 
-        existing_user = crud.crud_user.create_user(db=db, obj=new_user)
-        if not existing_user:
+        user = crud.crud_user.create_user(db=db, obj=new_user)
+        if not user:
             logger.error("Failed to save user information in db.")
             raise HTTPException(status_code=500, detail="Failed to create user.")
+
+        # Create default calendar templates for new user
+        crud.crud_calendar_template.create_default_templates_for_new_user(db=db, user_id=user.id)
     else:
         # User sign in
         if user.auth_provider != AuthProvider.GOOGLE:
