@@ -6,6 +6,8 @@ import {getLocalToken, isLoggedIn, removeLocalToken, saveLocalToken} from '@/uti
 import router from '@/router';
 import {loginPath, settingsPath} from "@/settings";
 import type {IMsg} from "@/interfaces/msg";
+import type {CalendarTemplateType} from "@/enums/CalendarTemplateType";
+import type {ICalendarTemplate} from "@/interfaces/calendarTemplate";
 
 export interface MainState {
     token: IToken | null;
@@ -27,6 +29,7 @@ export const useMainStore = defineStore('mainState', {
             try {
                 const response = await api.googleAuthCallback(state);
                 const token: IToken = response.data;
+                token.access_token_expires = new Date(token.access_token_expires);
                 if (token) {
                     saveLocalToken(token);
                     this.token = token;
@@ -103,6 +106,52 @@ export const useMainStore = defineStore('mainState', {
             } catch (error) {
                 console.error("Failed to retrieve user info.", error);
                 throw new Error("Failed to retrieve user info.");
+            }
+        },
+        async getCalendarTemplate(calendarTemplateType: CalendarTemplateType) {
+            if (!this.isLoggedIn || !this.hasValidAccessToken()) {
+                console.debug("User tried to retrieve user info but is not logged in or access token is expired.");
+                this.logout();
+                this.redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await api.getCalendarTemplate(this.token!.access_token, calendarTemplateType);
+                const calendarTemplate: ICalendarTemplate = response.data;
+                if (calendarTemplate) {
+                    return calendarTemplate;
+                } else {
+                    console.debug("Failed to retrieve calendar template. Signing user out.");
+                    this.logout();
+                    this.redirectToLogin();
+                }
+            } catch (error: any) {
+                console.error("Failed to retrieve calendar template.", error);
+                throw new Error("Failed to retrieve calendar template.");
+            }
+        },
+        async updateCalendarTemplate(id: string, template: ICalendarTemplate) {
+            if (!this.isLoggedIn || !this.hasValidAccessToken()) {
+                console.debug("User tried to retrieve user info but is not logged in or access token is expired.");
+                this.logout();
+                this.redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await api.updateCalendarTemplate(this.token!.access_token, id, template);
+                const calendarTemplate: ICalendarTemplate = response.data;
+                if (calendarTemplate) {
+                    return calendarTemplate;
+                } else {
+                    console.debug("Failed to update calendar template. Signing user out.");
+                    this.logout();
+                    this.redirectToLogin();
+                }
+            } catch (error: any) {
+                console.error("Failed to update calendar template.", error);
+                throw new Error(error.response.data.detail);
             }
         },
         hasValidAccessToken() {
