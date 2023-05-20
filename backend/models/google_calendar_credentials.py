@@ -1,5 +1,7 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, Optional, Set
+from sqlalchemy.dialects import postgresql
+from sqlalchemy import Column, String
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -11,7 +13,7 @@ class GoogleCalendarCredentialsBase(SQLModel):
     token: str = Field(index=True, nullable=False)
     expiry: datetime = Field(index=True, nullable=False)
     refresh_token: str = Field(index=True, nullable=False)
-    scopes: List[str] = Field(index=True, nullable=False)
+    scopes: Set[str] = Field(index=True, nullable=False, sa_column=Column(postgresql.ARRAY(String())))
     user_id: str = Field(foreign_key="user.id", nullable=False)
     user: "User" = Relationship(back_populates="calendar_credentials")
 
