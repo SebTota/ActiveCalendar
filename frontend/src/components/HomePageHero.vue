@@ -2,7 +2,7 @@
   <div class="hero h-full">
     <div class="hero-content h-full flex-col lg:flex-row-reverse">
       <div>
-        <img src="/src/assets/mock_one.png" alt="Phone mock with calendar view" class="max-w-100 sm:max-w-sm rounded-lg shadow-2xl" />
+        <img src="/src/assets/mock_one.png" alt="Phone mock with calendar view" class="max-w-100 hidden lg:block sm:max-w-sm rounded-lg shadow-2xl" />
       </div>
       <div>
         <h1 class="text-5xl font-bold">Active Calendar</h1>
