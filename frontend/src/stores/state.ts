@@ -34,7 +34,7 @@ export const useMainStore = defineStore('mainState', {
                     saveLocalToken(token);
                     this.token = token;
                     this.isLoggedIn = true;
-                    this.redirectToHomePage(false);
+                    this.redirectToSettings();
                 } else {
                     this.logout();
                     this.redirectToLogin();

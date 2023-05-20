@@ -62,24 +62,44 @@ const user: Ref<IUser | null> = ref(null);
 const currentNavigation: Ref<string> = ref(window.location.hash !== '' ? window.location.hash : '#account');
 
 const navigation = [
-    {name: 'Account', href: '#account'},
-    {name: 'Activity Template', href: '#activityTemplate'},
-    {name: 'Daily Template', href: '#dailyTemplate'},
-    {name: 'Weekly Template', href: '#weeklyTemplate'},
+    {name: 'Account', href: '#account'}
 ]
 
+const templateNavigation = [
+    {name: 'Activity Template', href: '#activityTemplate'},
+    {name: 'Daily Template', href: '#dailyTemplate'},
+    {name: 'Weekly Template', href: '#weeklyTemplate'}
+]
+
+function showTemplateNavFunc() {
+    navigation.push(...templateNavigation);
+}
+
+function setNav(navHash: string) {
+    currentNavigation.value = navHash;
+    window.location.hash = navHash;
+}
+
 onhashchange = (event) => {
-    currentNavigation.value = window.location.hash;
+    if (user.value && user.value?.hasStravaAuth && user.value?.hasGoogleCalendarAuth) {
+        currentNavigation.value = window.location.hash;
+    } else {
+        setNav('#account');
+    }
 };
 
 store.getMe().then((userInfo: IUser) => {
     user.value = userInfo;
     if (userInfo.hasStravaAuth && userInfo.hasGoogleCalendarAuth) {
-        currentNavigation.value = '#activityTemplate';
+        showTemplateNavFunc();
+        if (window.location.hash === '') {
+            setNav('#activityTemplate');
+        }
+    } else {
+        setNav('#account');
     }
     showLoading.value = false;
 }).catch((err: Error) => {
-    console.log(err);
     error.value = err.message;
     showLoading.value = false;
 })
