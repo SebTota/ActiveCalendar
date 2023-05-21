@@ -1,5 +1,5 @@
 <template>
-    <router-view :key="this.$route.path">
+    <router-view :key="$route.path">
         <Header/>
     </router-view>
     <div class="remaining_height">
