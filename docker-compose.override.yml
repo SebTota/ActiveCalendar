@@ -53,7 +53,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
     build:
       context: ./frontend
-      dockerfile: frontend.dockerfile
+      dockerfile: frontend.override.dockerfile
       args:
         FRONTEND_ENV: dev
     labels:
