@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class CalendarEventBase(SQLModel):
     start_date: datetime = Field(index=True, nullable=False)
     end_date: datetime = Field(index=True, nullable=False)
-    strava_event_id: Optional[int] = Field(index=True, default=None, sa_column=Column(BigInteger(), primary_key=True, autoincrement=False))
+    strava_event_id: Optional[int] = Field(index=True, default=None, sa_column=Column(BigInteger()))
     calendar_event_id: str = Field(index=True, nullable=False)
     user_id: str = Field(foreign_key="user.id")
     user: "User" = Relationship(back_populates="calendar_events")
