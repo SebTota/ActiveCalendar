@@ -6,14 +6,14 @@ export const aboutPath: string = "/about";
 
 
 function getBackendRoute(): string {
-    const dev: boolean = true;
+    const env = import.meta.env.VITE_APP_ENV;
+    console.log(`VUE_APP_ENV: ${env}`);
 
-    if (dev) {
-        return `http://localhost`;
+    if (env === "production") {
+        return `https://active.sebtota.com`;
     } else {
-        return `https://${window.location.hostname}`;
+        return `http://localhost`;
     }
-    
 }
 
 export const backendRouteBase: string = getBackendRoute();

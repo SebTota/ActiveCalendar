@@ -5,8 +5,8 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     PROJECT_NAME: str = os.getenv('PROJECT_NAME')
     API_V1_STR: str = '/api/v1'
-    API_HOST: str = f'http://localhost{API_V1_STR}'
-    UI_HOST: str = f'http://localhost'
+    UI_HOST: str = 'http://localhost' if os.getenv('ENVIRONMENT') == 'development' else 'https://active.sebtota.com'
+    API_HOST: str = f'{UI_HOST}{API_V1_STR}'
     GOOGLE_CALENDAR_AUTH_CALLBACK_URL: str = f'{UI_HOST}/google/calendar/callback'
     GOOGLE_OAUTH_CALLBACK_URL: str = f'{UI_HOST}/login'
     STRAVA_AUTH_CALLBACK_URL: str = f'{UI_HOST}/strava/callback'
