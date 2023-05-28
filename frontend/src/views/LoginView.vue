@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
-            <img class="mx-auto h-50 w-auto" src="../assets/ActiveRunWideLogo.png" alt="Active" />
+            <img class="mx-auto h-50 w-auto" src="../assets/ActiveCalendarWideLogo.png" alt="Active" />
             <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-300">Sign in or create
                 your
                 account.</h2>

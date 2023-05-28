@@ -1,6 +1,6 @@
 import type {IToken} from "@/interfaces/token";
 
-const LOCAL_STORAGE_NAME_AUTH_TOKEN: string = 'ActiveRunAuthToken';
+const LOCAL_STORAGE_NAME_AUTH_TOKEN: string = 'ActiveCalendarAuthToken';
 
 export const getLocalToken = (): IToken | null => {
     const serializedToken: string | null = localStorage.getItem(LOCAL_STORAGE_NAME_AUTH_TOKEN);

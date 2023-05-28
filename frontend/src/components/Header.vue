@@ -13,8 +13,8 @@
                 </div>
                 <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                     <div class="flex flex-shrink-0 items-center">
-                        <img class="block h-8 w-auto lg:hidden" src="../assets/ActiveRunWideLogo.png" alt="Active Run"/>
-                        <img class="hidden h-8 w-auto lg:block" src="../assets/ActiveRunWideLogo.png" alt="Active Run"/>
+                        <img class="block h-8 w-auto lg:hidden" src="../assets/ActiveCalendarWideLogo.png" alt="Active Run"/>
+                        <img class="hidden h-8 w-auto lg:block" src="../assets/ActiveCalendarWideLogo.png" alt="Active Run"/>
                     </div>
                     <div class="hidden sm:ml-6 sm:block">
                         <div class="flex space-x-4">
