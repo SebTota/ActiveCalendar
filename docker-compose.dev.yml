@@ -1,0 +1,48 @@
+version: "3.3"
+services:
+
+  proxy:
+    image: traefik:v2.9.6
+    ports:
+      - "80:80"
+      - "8090:8080"
+    volumes:
+      - ./traefik/traefik.dev.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  backend:
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/backend
+    environment:
+      - SERVER_NAME=http://localhost
+      - SERVER_HOST=http://localhost
+    build:
+      context: ./backend
+      dockerfile: backend.dev.dockerfile
+      args:
+        INSTALL_DEV: ${INSTALL_DEV-true}
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+      - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
+      - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
+
+
+  frontend:
+    volumes:
+      - ./frontend:/frontend
+      - /frontend/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    build:
+      context: ./frontend
+      dockerfile: frontend.dev.dockerfile
+      args:
+        FRONTEND_ENV: dev
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+      - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
+      - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=5173

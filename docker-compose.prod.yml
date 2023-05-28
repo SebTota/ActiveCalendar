@@ -1,0 +1,70 @@
+version: "3.3"
+services:
+  proxy:
+    build:
+      context: ./traefik
+      dockerfile: Dockerfile.traefik
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8090:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./traefik-public-certificates:/certificates"
+    labels:
+      # Enable Traefik for this service, to make it available in the public network
+      - traefik.enable=true
+      # Use the custom label "traefik.constraint-label=traefik-public"
+      # This public Traefik will only use services with this label
+      - traefik.constraint-label=${TRAEFIK_PUBLIC_TAG?Variable not set}
+      # traefik-http set up only to use the middleware to redirect to https
+      - traefik.http.middlewares.${STACK_NAME?Variable not set}-https-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.${STACK_NAME?Variable not set}-https-redirect.redirectscheme.permanent=true
+      # Handle requests from domain
+      - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.rule=Host(`${DOMAIN?Variable not set}`) || Host(`www.${DOMAIN?Variable not set}`)
+      - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.tls=true
+      - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.tls.certresolver=letsencrypt
+      # Define the port inside of the Docker service to use
+      - traefik.http.services.${STACK_NAME?Variable not set}-proxy.loadbalancer.server.port=80
+
+
+  backend:
+    volumes:
+      - ./backend:/backend
+    env_file:
+      - .env
+    environment:
+      - "SERVER_NAME=https://active.sebtota.com"
+      - "SERVER_HOST=https://active.sebtota.com"
+    build:
+      context: ./backend
+      dockerfile: backend.prod.dockerfile
+      args:
+        INSTALL_DEV: ${INSTALL_DEV-false}
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+      - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`)
+      - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
+
+
+  frontend:
+    volumes:
+      - ./frontend:/frontend
+      - /frontend/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    build:
+      context: ./frontend
+      dockerfile: frontend.prod.dockerfile
+      args:
+        FRONTEND_ENV: production
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+      - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
+      - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=5173
+
+
+volumes:
+  traefik-public-certificates:

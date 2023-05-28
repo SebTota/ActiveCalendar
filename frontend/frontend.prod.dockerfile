@@ -11,7 +11,7 @@ COPY ./ /app/
 
 ARG FRONTEND_ENV=production
 
-ENV VUE_APP_ENV=${FRONTEND_ENV}
+ENV VITE_APP_ENV=${FRONTEND_ENV}
 
 RUN npm run build
 
