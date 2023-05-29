@@ -5,8 +5,8 @@ services:
       context: ./traefik
       dockerfile: Dockerfile.traefik
     ports:
-      - "80:80"
-      - "443:443"
+      - "90:80"
+      - "553:443"
       - "8090:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
