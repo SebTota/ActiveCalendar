@@ -49,9 +49,7 @@ class StravaAccessor:
         self._strava_credentials.expires_at = datetime.fromtimestamp(refresh_response['expires_at'], timezone.utc)
 
         self._strava_credentials = crud.strava_credentials.update(db=self._db, obj=self._strava_credentials)
-
-        logger.info(f"Updated strava user: {self._strava_credentials.user} expired credentials.")
-
+        self._init_strava_client()
         return self._strava_credentials
 
     def get_athlete_id(self) -> int:
